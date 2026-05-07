@@ -1,40 +1,30 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Expired Tracker</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .sync-indicator {
-      width: 12px;
-      height: 12px;
-      border: 2px solid #3b82f6;
-      border-top: 2px solid transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    body{
+      font-family:'Plus Jakarta Sans',sans-serif;
     }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 min-h-screen pb-20">
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-24">
 
 <div class="max-w-md mx-auto">
 
+<!-- HEADER -->
+
 <header class="bg-blue-600 text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-xl text-center">
+
   <h1 class="text-2xl font-extrabold tracking-tight">
     EXPIRED TRACKER
   </h1>
@@ -42,19 +32,28 @@
   <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">
     Manajemen Stok Mobile
   </p>
+
 </header>
+
+
+<!-- TAB -->
 
 <div class="px-5 -mt-6 mb-4">
 
   <div class="flex bg-white p-1 rounded-2xl shadow-lg border border-slate-200">
 
+    <button onclick="switchView('dashboard')" id="tab-dashboard"
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md">
+      Dashboard
+    </button>
+
     <button onclick="switchView('input')" id="tab-input"
-      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all bg-blue-600 text-white shadow-md">
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
       Input
     </button>
 
     <button onclick="switchView('history')" id="tab-history"
-      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all text-slate-400">
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
       Riwayat
     </button>
 
@@ -62,9 +61,74 @@
 
 </div>
 
+
+
+<!-- DASHBOARD -->
+
+<div id="view-dashboard" class="p-5 space-y-5">
+
+  <div class="grid grid-cols-2 gap-4">
+
+    <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
+
+      <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
+        Input Hari Ini
+      </div>
+
+      <div id="statToday"
+        class="mt-2 text-3xl font-extrabold text-blue-600">
+        0
+      </div>
+
+    </div>
+
+    <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
+
+      <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
+        Expired Hari Ini
+      </div>
+
+      <div id="statExpired"
+        class="mt-2 text-3xl font-extrabold text-red-500">
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
+
+    <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
+      Top PIC
+    </div>
+
+    <div id="topPic"
+      class="mt-3 text-xl font-extrabold text-slate-800">
+      -
+    </div>
+
+  </div>
+
+
+  <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
+
+    <div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
+      Grafik 7 Hari Terakhir
+    </div>
+
+    <canvas id="weeklyChart"></canvas>
+
+  </div>
+
+</div>
+
+
+
 <!-- INPUT -->
 
-<div id="view-input" class="p-5 space-y-6">
+<div id="view-input" class="hidden p-5 space-y-6">
 
   <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
 
@@ -79,7 +143,7 @@
         id="searchInput"
         oninput="handleSearch()"
         placeholder="Ketik minimal 2 huruf..."
-        class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-xl outline-none font-bold text-slate-700 transition-all">
+        class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-xl outline-none font-bold text-slate-700">
 
       <div
         id="dropdown"
@@ -90,8 +154,9 @@
 
   </div>
 
+
   <form id="inputForm"
-    class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all duration-300">
+    class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all">
 
     <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
 
@@ -115,6 +180,7 @@
 
     </div>
 
+
     <div class="grid grid-cols-2 gap-4">
 
       <div>
@@ -131,6 +197,7 @@
           class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
 
       </div>
+
 
       <div>
 
@@ -149,6 +216,7 @@
 
     </div>
 
+
     <div>
 
       <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
@@ -163,6 +231,7 @@
 
     </div>
 
+
     <button
       type="submit"
       id="btnSubmit"
@@ -173,6 +242,7 @@
       </span>
 
     </button>
+
 
     <button
       type="button"
@@ -188,6 +258,8 @@
 
 </div>
 
+
+
 <!-- HISTORY -->
 
 <div id="view-history" class="hidden p-5 space-y-4">
@@ -201,9 +273,7 @@
     <button
       onclick="loadHistory()"
       class="text-[10px] font-bold text-blue-600 uppercase">
-
       Refresh
-
     </button>
 
   </div>
@@ -212,11 +282,17 @@
 
 </div>
 
+
+
+<!-- NOTIF -->
+
 <div id="notif"
   class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl">
 </div>
 
 </div>
+
+
 
 <script>
 
@@ -225,9 +301,14 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx0TkK_9WokaWidnOpKj5rC
 let masterData = [];
 
 window.onload = function() {
+
   fetchMaster();
+
   loadHistory();
+
 };
+
+
 
 async function fetchMaster() {
 
@@ -237,6 +318,8 @@ async function fetchMaster() {
 
 }
 
+
+
 async function loadHistory() {
 
   const res = await fetch(API_URL + "?action=history");
@@ -245,9 +328,16 @@ async function loadHistory() {
 
   renderHistory(data);
 
+  updateDashboard(data);
+
 }
 
+
+
 function switchView(v) {
+
+  document.getElementById('view-dashboard')
+    .classList.toggle('hidden', v !== 'dashboard');
 
   document.getElementById('view-input')
     .classList.toggle('hidden', v !== 'input');
@@ -255,10 +345,18 @@ function switchView(v) {
   document.getElementById('view-history')
     .classList.toggle('hidden', v !== 'history');
 
+
+  document.getElementById('tab-dashboard').className =
+    v === 'dashboard'
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+
+
   document.getElementById('tab-input').className =
     v === 'input'
     ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
     : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+
 
   document.getElementById('tab-history').className =
     v === 'history'
@@ -266,6 +364,8 @@ function switchView(v) {
     : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
 
 }
+
+
 
 function handleSearch() {
 
@@ -286,9 +386,9 @@ function handleSearch() {
   const filtered = masterData.filter(i =>
     i.sku.toLowerCase().includes(q) ||
     i.desc.toLowerCase().includes(q)
-  ).slice(0, 10);
+  ).slice(0,10);
 
-  if (filtered.length > 0) {
+  if(filtered.length > 0){
 
     dd.innerHTML = filtered.map(i => `
 
@@ -310,7 +410,7 @@ function handleSearch() {
 
     dd.classList.remove('hidden');
 
-  } else {
+  }else{
 
     dd.classList.add('hidden');
 
@@ -318,7 +418,9 @@ function handleSearch() {
 
 }
 
-function selectItem(sku, desc) {
+
+
+function selectItem(sku,desc){
 
   document.getElementById('display-sku').innerText = sku;
 
@@ -333,15 +435,31 @@ function selectItem(sku, desc) {
   document.getElementById('searchInput').value = '';
 
   document.getElementById('inputForm')
-    .classList.remove('opacity-40', 'pointer-events-none');
+    .classList.remove('opacity-40','pointer-events-none');
 
 }
 
-function renderHistory(data) {
+
+
+function formatDate(dateString){
+
+  const d = new Date(dateString);
+
+  return d.toLocaleDateString('id-ID',{
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric'
+  });
+
+}
+
+
+
+function renderHistory(data){
 
   const list = document.getElementById('history-list');
 
-  if (!data || data.length === 0) {
+  if(!data || data.length === 0){
 
     list.innerHTML = `
       <div class="text-center py-10 text-slate-400 text-xs font-medium">
@@ -388,7 +506,7 @@ function renderHistory(data) {
       <div class="flex justify-between items-center pt-2 border-t border-slate-50">
 
         <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">
-          EXP: ${item.expired}
+          EXP: ${formatDate(item.expired)}
         </div>
 
         <div class="flex gap-2">
@@ -419,74 +537,208 @@ function renderHistory(data) {
 
 }
 
-function editItem(item) {
 
-  switchView('input');
 
-  document.getElementById('display-sku').innerText = item.sku;
+function updateDashboard(data){
 
-  document.getElementById('display-desc').innerText = item.desc;
+  const today = new Date().toISOString().split('T')[0];
 
-  document.getElementById('val-sku').value = item.sku;
+  let todayCount = 0;
+  let expiredToday = 0;
 
-  document.getElementById('val-desc').value = item.desc;
+  const picCount = {};
+  const chartMap = {};
 
-  document.getElementById('qty').value = item.qty;
+  data.forEach(item => {
 
-  document.getElementById('pic').value = item.pic;
+    const inputDate =
+      new Date(item.timestamp)
+      .toISOString()
+      .split('T')[0];
 
-  document.getElementById('expiredDate').value = item.expired;
+    const expDate =
+      new Date(item.expired)
+      .toISOString()
+      .split('T')[0];
 
-  document.getElementById('edit-timestamp').value = item.timestamp;
+    if(inputDate === today){
+      todayCount++;
+    }
 
-  document.getElementById('btn-text').innerText = "UPDATE DATA";
+    if(expDate === today){
+      expiredToday++;
+    }
 
-  document.getElementById('btnCancelEdit').classList.remove('hidden');
+    if(!picCount[item.pic]){
+      picCount[item.pic] = 0;
+    }
 
-  document.getElementById('inputForm')
-    .classList.remove('opacity-40', 'pointer-events-none');
+    picCount[item.pic]++;
+
+    if(!chartMap[inputDate]){
+      chartMap[inputDate] = 0;
+    }
+
+    chartMap[inputDate]++;
+
+  });
+
+  document.getElementById('statToday').innerText =
+    todayCount;
+
+  document.getElementById('statExpired').innerText =
+    expiredToday;
+
+
+  let topPic = "-";
+  let topCount = 0;
+
+  for(const pic in picCount){
+
+    if(picCount[pic] > topCount){
+
+      topCount = picCount[pic];
+
+      topPic = `${pic} (${topCount})`;
+
+    }
+
+  }
+
+  document.getElementById('topPic').innerText =
+    topPic;
+
+
+  const labels = Object.keys(chartMap).slice(-7);
+
+  const values = Object.values(chartMap).slice(-7);
+
+
+  const ctx = document
+    .getElementById('weeklyChart')
+    .getContext('2d');
+
+  if(window.myChart){
+    window.myChart.destroy();
+  }
+
+  window.myChart = new Chart(ctx,{
+
+    type:'line',
+
+    data:{
+      labels:labels,
+
+      datasets:[{
+        label:'Input',
+        data:values,
+        tension:0.4
+      }]
+    },
+
+    options:{
+      responsive:true,
+
+      plugins:{
+        legend:{
+          display:false
+        }
+      }
+    }
+
+  });
 
 }
 
-function cancelEdit() {
+
+
+function editItem(item){
+
+  switchView('input');
+
+  document.getElementById('display-sku').innerText =
+    item.sku;
+
+  document.getElementById('display-desc').innerText =
+    item.desc;
+
+  document.getElementById('val-sku').value =
+    item.sku;
+
+  document.getElementById('val-desc').value =
+    item.desc;
+
+  document.getElementById('qty').value =
+    item.qty;
+
+  document.getElementById('pic').value =
+    item.pic;
+
+  document.getElementById('expiredDate').value =
+    item.expired.split('T')[0];
+
+  document.getElementById('edit-timestamp').value =
+    item.timestamp;
+
+  document.getElementById('btn-text').innerText =
+    "UPDATE DATA";
+
+  document.getElementById('btnCancelEdit')
+    .classList.remove('hidden');
+
+  document.getElementById('inputForm')
+    .classList.remove('opacity-40','pointer-events-none');
+
+}
+
+
+
+function cancelEdit(){
 
   document.getElementById('inputForm').reset();
 
   document.getElementById('edit-timestamp').value = "";
 
-  document.getElementById('btn-text').innerText = "SIMPAN DATA";
+  document.getElementById('btn-text').innerText =
+    "SIMPAN DATA";
 
-  document.getElementById('btnCancelEdit').classList.add('hidden');
+  document.getElementById('btnCancelEdit')
+    .classList.add('hidden');
 
   document.getElementById('inputForm')
-    .classList.add('opacity-40', 'pointer-events-none');
+    .classList.add('opacity-40','pointer-events-none');
 
-  document.getElementById('display-sku').innerText = "---";
+  document.getElementById('display-sku').innerText =
+    "---";
 
   document.getElementById('display-desc').innerText =
     "Silakan pilih dari pencarian";
 
 }
 
-async function deleteItem(timestamp) {
 
-  if (!confirm("Hapus data ini?")) return;
 
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "delete",
-      timestamp: timestamp
+async function deleteItem(timestamp){
+
+  if(!confirm("Hapus data ini?")) return;
+
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"delete",
+      timestamp:timestamp
     })
   });
 
-  showNotif("Berhasil dihapus", "red");
+  showNotif("Berhasil dihapus","red");
 
   loadHistory();
 
 }
 
-function showNotif(msg, color) {
+
+
+function showNotif(msg,color){
 
   const n = document.getElementById('notif');
 
@@ -499,11 +751,14 @@ function showNotif(msg, color) {
 
   setTimeout(() => {
     n.classList.add('hidden');
-  }, 3000);
+  },3000);
 
 }
 
-document.getElementById('inputForm').onsubmit = async function(e) {
+
+
+document.getElementById('inputForm').onsubmit =
+async function(e){
 
   e.preventDefault();
 
@@ -528,14 +783,14 @@ document.getElementById('inputForm').onsubmit = async function(e) {
 
   };
 
-  showNotif("Menyimpan...", "blue");
+  showNotif("Menyimpan...","blue");
 
-  await fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
+  await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify(data)
   });
 
-  showNotif("Berhasil disimpan", "emerald");
+  showNotif("Berhasil disimpan","emerald");
 
   cancelEdit();
 
