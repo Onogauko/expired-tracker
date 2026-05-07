@@ -32,310 +32,518 @@
 
 <body class="bg-slate-50 text-slate-900 min-h-screen pb-20">
 
-  <div class="max-w-md mx-auto">
+<div class="max-w-md mx-auto">
 
-    <!-- HEADER -->
-    <header class="bg-blue-600 text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-xl text-center">
-      <h1 class="text-2xl font-extrabold tracking-tight">
-        EXPIRED TRACKER
-      </h1>
+<header class="bg-blue-600 text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-xl text-center">
+  <h1 class="text-2xl font-extrabold tracking-tight">
+    EXPIRED TRACKER
+  </h1>
 
-      <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">
-        Manajemen Stok Mobile
-      </p>
-    </header>
+  <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">
+    Manajemen Stok Mobile
+  </p>
+</header>
 
-    <!-- TAB -->
-    <div class="px-5 -mt-6 mb-4">
-      <div class="flex bg-white p-1 rounded-2xl shadow-lg border border-slate-200">
+<div class="px-5 -mt-6 mb-4">
 
-        <button
-          onclick="switchView('input')"
-          id="tab-input"
-          class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all bg-blue-600 text-white shadow-md">
-          Input
-        </button>
+  <div class="flex bg-white p-1 rounded-2xl shadow-lg border border-slate-200">
 
-        <button
-          onclick="switchView('history')"
-          id="tab-history"
-          class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all text-slate-400">
-          Riwayat
-        </button>
+    <button onclick="switchView('input')" id="tab-input"
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all bg-blue-600 text-white shadow-md">
+      Input
+    </button>
 
-      </div>
-    </div>
+    <button onclick="switchView('history')" id="tab-history"
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all text-slate-400">
+      Riwayat
+    </button>
 
-    <!-- INPUT VIEW -->
-    <div id="view-input" class="p-5 space-y-6">
+  </div>
 
-      <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
+</div>
 
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">
-          SKU
-        </label>
+<!-- INPUT -->
 
-        <input
-          type="text"
-          id="sku"
-          placeholder="SKU"
-          class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none font-bold">
+<div id="view-input" class="p-5 space-y-6">
 
-      </div>
+  <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
 
-      <form
-        id="inputForm"
-        class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200">
+    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">
+      Cari Nama / SKU Barang
+    </label>
 
-        <div>
+    <div class="relative">
 
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-            Description
-          </label>
+      <input
+        type="text"
+        id="searchInput"
+        oninput="handleSearch()"
+        placeholder="Ketik minimal 2 huruf..."
+        class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-xl outline-none font-bold text-slate-700 transition-all">
 
-          <input
-            type="text"
-            id="desc"
-            required
-            placeholder="Nama Barang"
-            class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
-
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-              Qty
-            </label>
-
-            <input
-              type="number"
-              id="qty"
-              required
-              placeholder="0"
-              class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
-          </div>
-
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-              PIC
-            </label>
-
-            <input
-              type="text"
-              id="pic"
-              required
-              placeholder="Nama"
-              class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold uppercase">
-          </div>
-
-        </div>
-
-        <div>
-
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-            Expired Date
-          </label>
-
-          <input
-            type="date"
-            id="expiredDate"
-            required
-            class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900 outline-none">
-
-        </div>
-
-        <button
-          type="submit"
-          class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-extrabold text-lg shadow-lg">
-
-          SIMPAN DATA
-
-        </button>
-
-      </form>
-
-    </div>
-
-    <!-- HISTORY -->
-    <div id="view-history" class="hidden p-5 space-y-4">
-
-      <div class="flex justify-between items-center px-2">
-
-        <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">
-          Riwayat
-        </h2>
-
-        <button
-          onclick="loadHistory()"
-          class="text-[10px] font-bold text-blue-600 uppercase">
-          Refresh
-        </button>
-
+      <div
+        id="dropdown"
+        class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 hidden max-h-60 overflow-y-auto">
       </div>
 
-      <div id="history-list" class="space-y-3"></div>
-
-    </div>
-
-    <!-- NOTIF -->
-    <div
-      id="notif"
-      class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl">
     </div>
 
   </div>
 
-  <script>
+  <form id="inputForm"
+    class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all duration-300">
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbx0TkK_9WokaWidnOpKj5rCWQg_FWXk5l_DrqKsceMgh_ESO56V2QIj5BM3hUlk-vMZWg/exec";
+    <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
 
-    window.onload = function () {
-      loadHistory();
-    };
+      <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">
+        Detail Item
+      </p>
 
-    function switchView(v) {
+      <div id="display-sku"
+        class="font-extrabold text-blue-900 text-lg leading-tight mt-1">
+        ---
+      </div>
 
-      document.getElementById('view-input')
-        .classList.toggle('hidden', v !== 'input');
+      <div id="display-desc"
+        class="text-xs text-blue-600 font-medium mt-1 italic leading-tight">
+        Silakan pilih dari pencarian
+      </div>
 
-      document.getElementById('view-history')
-        .classList.toggle('hidden', v !== 'history');
+      <input type="hidden" id="val-sku">
+      <input type="hidden" id="val-desc">
+      <input type="hidden" id="edit-timestamp">
 
-      document.getElementById('tab-input').className =
-        v === 'input'
-        ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
-        : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+    </div>
 
-      document.getElementById('tab-history').className =
-        v === 'history'
-        ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
-        : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+    <div class="grid grid-cols-2 gap-4">
 
-      if (v === 'history') {
-        loadHistory();
-      }
-    }
+      <div>
 
-    async function loadHistory() {
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+          Qty
+        </label>
 
-      const res = await fetch(API_URL);
+        <input
+          type="number"
+          id="qty"
+          required
+          placeholder="0"
+          class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
 
-      const data = await res.json();
+      </div>
 
-      renderHistory(data);
+      <div>
 
-    }
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+          PIC
+        </label>
 
-    function renderHistory(data) {
+        <input
+          type="text"
+          id="pic"
+          required
+          placeholder="Nama"
+          class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold uppercase">
 
-      const list = document.getElementById('history-list');
+      </div>
 
-      if (!data || data.length === 0) {
+    </div>
 
-        list.innerHTML = `
-          <div class="text-center py-10 text-slate-400 text-xs font-medium">
-            Belum ada data.
+    <div>
+
+      <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+        Expired Date
+      </label>
+
+      <input
+        type="date"
+        id="expiredDate"
+        required
+        class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900 outline-none">
+
+    </div>
+
+    <button
+      type="submit"
+      id="btnSubmit"
+      class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-extrabold text-lg shadow-lg">
+
+      <span id="btn-text">
+        SIMPAN DATA
+      </span>
+
+    </button>
+
+    <button
+      type="button"
+      id="btnCancelEdit"
+      onclick="cancelEdit()"
+      class="hidden w-full py-3 text-xs font-bold text-slate-400 uppercase">
+
+      Batal Edit
+
+    </button>
+
+  </form>
+
+</div>
+
+<!-- HISTORY -->
+
+<div id="view-history" class="hidden p-5 space-y-4">
+
+  <div class="flex justify-between items-center px-2">
+
+    <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">
+      Riwayat
+    </h2>
+
+    <button
+      onclick="loadHistory()"
+      class="text-[10px] font-bold text-blue-600 uppercase">
+
+      Refresh
+
+    </button>
+
+  </div>
+
+  <div id="history-list" class="space-y-3"></div>
+
+</div>
+
+<div id="notif"
+  class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl">
+</div>
+
+</div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbx0TkK_9WokaWidnOpKj5rCWQg_FWXk5l_DrqKsceMgh_ESO56V2QIj5BM3hUlk-vMZWg/exec";
+
+let masterData = [];
+
+window.onload = function() {
+  fetchMaster();
+  loadHistory();
+};
+
+async function fetchMaster() {
+
+  const res = await fetch(API_URL + "?action=master");
+
+  masterData = await res.json();
+
+}
+
+async function loadHistory() {
+
+  const res = await fetch(API_URL + "?action=history");
+
+  const data = await res.json();
+
+  renderHistory(data);
+
+}
+
+function switchView(v) {
+
+  document.getElementById('view-input')
+    .classList.toggle('hidden', v !== 'input');
+
+  document.getElementById('view-history')
+    .classList.toggle('hidden', v !== 'history');
+
+  document.getElementById('tab-input').className =
+    v === 'input'
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+
+  document.getElementById('tab-history').className =
+    v === 'history'
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+
+}
+
+function handleSearch() {
+
+  const q = document.getElementById('searchInput')
+    .value
+    .toLowerCase();
+
+  const dd = document.getElementById('dropdown');
+
+  if (q.length < 2) {
+
+    dd.classList.add('hidden');
+
+    return;
+
+  }
+
+  const filtered = masterData.filter(i =>
+    i.sku.toLowerCase().includes(q) ||
+    i.desc.toLowerCase().includes(q)
+  ).slice(0, 10);
+
+  if (filtered.length > 0) {
+
+    dd.innerHTML = filtered.map(i => `
+
+      <div
+        onclick="selectItem('${i.sku}','${i.desc.replace(/'/g, "\\'")}')"
+        class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col">
+
+        <span class="font-black text-blue-700 text-sm">
+          ${i.sku}
+        </span>
+
+        <span class="text-xs text-slate-500 font-medium truncate">
+          ${i.desc}
+        </span>
+
+      </div>
+
+    `).join('');
+
+    dd.classList.remove('hidden');
+
+  } else {
+
+    dd.classList.add('hidden');
+
+  }
+
+}
+
+function selectItem(sku, desc) {
+
+  document.getElementById('display-sku').innerText = sku;
+
+  document.getElementById('display-desc').innerText = desc;
+
+  document.getElementById('val-sku').value = sku;
+
+  document.getElementById('val-desc').value = desc;
+
+  document.getElementById('dropdown').classList.add('hidden');
+
+  document.getElementById('searchInput').value = '';
+
+  document.getElementById('inputForm')
+    .classList.remove('opacity-40', 'pointer-events-none');
+
+}
+
+function renderHistory(data) {
+
+  const list = document.getElementById('history-list');
+
+  if (!data || data.length === 0) {
+
+    list.innerHTML = `
+      <div class="text-center py-10 text-slate-400 text-xs font-medium">
+        Belum ada data.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  list.innerHTML = data.map(item => `
+
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-2">
+
+      <div class="flex justify-between items-start">
+
+        <div>
+
+          <div class="text-[10px] font-black text-blue-500 uppercase tracking-tighter">
+            ${item.sku}
           </div>
-        `;
 
-        return;
-      }
-
-      list.innerHTML = data.reverse().map(item => `
-
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-2">
-
-          <div class="flex justify-between items-start">
-
-            <div>
-              <div class="text-[10px] font-black text-blue-500 uppercase tracking-tighter">
-                ${item.sku}
-              </div>
-
-              <div class="text-sm font-bold text-slate-800 leading-tight">
-                ${item.desc}
-              </div>
-            </div>
-
-            <div class="text-right">
-              <div class="text-[10px] font-bold text-slate-400 uppercase">
-                ${item.pic}
-              </div>
-
-              <div class="text-[10px] font-black text-slate-900">
-                QTY: ${item.qty}
-              </div>
-            </div>
-
-          </div>
-
-          <div class="pt-2 border-t border-slate-50">
-
-            <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">
-              EXP: ${item.expired}
-            </div>
-
+          <div class="text-sm font-bold text-slate-800 leading-tight">
+            ${item.desc}
           </div>
 
         </div>
 
-      `).join('');
+        <div class="text-right">
 
-    }
+          <div class="text-[10px] font-bold text-slate-400 uppercase">
+            ${item.pic}
+          </div>
 
-    function showNotif(message, color) {
+          <div class="text-[10px] font-black text-slate-900">
+            QTY: ${item.qty}
+          </div>
 
-      const n = document.getElementById('notif');
+        </div>
 
-      n.className =
-        `fixed bottom-8 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[100] text-white font-bold text-sm text-center bg-${color}-500`;
+      </div>
 
-      n.innerText = message;
+      <div class="flex justify-between items-center pt-2 border-t border-slate-50">
 
-      n.classList.remove('hidden');
+        <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">
+          EXP: ${item.expired}
+        </div>
 
-      setTimeout(() => {
-        n.classList.add('hidden');
-      }, 3000);
+        <div class="flex gap-2">
 
-    }
+          <button
+            onclick='editItem(${JSON.stringify(item)})'
+            class="px-3 py-1 bg-slate-100 text-[9px] font-black uppercase rounded-lg text-slate-600">
 
-    document.getElementById('inputForm').onsubmit = async function(e) {
+            Edit
 
-      e.preventDefault();
+          </button>
 
-      const data = {
+          <button
+            onclick="deleteItem('${item.timestamp}')"
+            class="px-3 py-1 bg-red-50 text-[9px] font-black uppercase rounded-lg text-red-500">
 
-        sku: document.getElementById('sku').value,
+            Hapus
 
-        desc: document.getElementById('desc').value,
+          </button>
 
-        qty: document.getElementById('qty').value,
+        </div>
 
-        pic: document.getElementById('pic').value,
+      </div>
 
-        expired: document.getElementById('expiredDate').value
+    </div>
 
-      };
+  `).join('');
 
-      showNotif("Menyimpan...", "blue");
+}
 
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
+function editItem(item) {
 
-      showNotif("Data Berhasil Disimpan!", "emerald");
+  switchView('input');
 
-      document.getElementById('inputForm').reset();
+  document.getElementById('display-sku').innerText = item.sku;
 
-      loadHistory();
+  document.getElementById('display-desc').innerText = item.desc;
 
-    };
+  document.getElementById('val-sku').value = item.sku;
 
-  </script>
+  document.getElementById('val-desc').value = item.desc;
+
+  document.getElementById('qty').value = item.qty;
+
+  document.getElementById('pic').value = item.pic;
+
+  document.getElementById('expiredDate').value = item.expired;
+
+  document.getElementById('edit-timestamp').value = item.timestamp;
+
+  document.getElementById('btn-text').innerText = "UPDATE DATA";
+
+  document.getElementById('btnCancelEdit').classList.remove('hidden');
+
+  document.getElementById('inputForm')
+    .classList.remove('opacity-40', 'pointer-events-none');
+
+}
+
+function cancelEdit() {
+
+  document.getElementById('inputForm').reset();
+
+  document.getElementById('edit-timestamp').value = "";
+
+  document.getElementById('btn-text').innerText = "SIMPAN DATA";
+
+  document.getElementById('btnCancelEdit').classList.add('hidden');
+
+  document.getElementById('inputForm')
+    .classList.add('opacity-40', 'pointer-events-none');
+
+  document.getElementById('display-sku').innerText = "---";
+
+  document.getElementById('display-desc').innerText =
+    "Silakan pilih dari pencarian";
+
+}
+
+async function deleteItem(timestamp) {
+
+  if (!confirm("Hapus data ini?")) return;
+
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "delete",
+      timestamp: timestamp
+    })
+  });
+
+  showNotif("Berhasil dihapus", "red");
+
+  loadHistory();
+
+}
+
+function showNotif(msg, color) {
+
+  const n = document.getElementById('notif');
+
+  n.className =
+    `fixed bottom-8 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[100] text-white font-bold text-sm text-center bg-${color}-500`;
+
+  n.innerText = msg;
+
+  n.classList.remove('hidden');
+
+  setTimeout(() => {
+    n.classList.add('hidden');
+  }, 3000);
+
+}
+
+document.getElementById('inputForm').onsubmit = async function(e) {
+
+  e.preventDefault();
+
+  const timestamp =
+    document.getElementById('edit-timestamp').value;
+
+  const data = {
+
+    action: timestamp ? "edit" : "save",
+
+    timestamp: timestamp,
+
+    sku: document.getElementById('val-sku').value,
+
+    desc: document.getElementById('val-desc').value,
+
+    qty: document.getElementById('qty').value,
+
+    pic: document.getElementById('pic').value,
+
+    expired: document.getElementById('expiredDate').value
+
+  };
+
+  showNotif("Menyimpan...", "blue");
+
+  await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+
+  showNotif("Berhasil disimpan", "emerald");
+
+  cancelEdit();
+
+  loadHistory();
+
+};
+
+</script>
 
 </body>
 </html>
