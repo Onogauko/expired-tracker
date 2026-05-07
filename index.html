@@ -337,6 +337,18 @@ function selectItem(sku, desc) {
 
 }
 
+function formatDate(dateString) {
+
+  const d = new Date(dateString);
+
+  return d.toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+
+}
+
 function renderHistory(data) {
 
   const list = document.getElementById('history-list');
@@ -388,7 +400,7 @@ function renderHistory(data) {
       <div class="flex justify-between items-center pt-2 border-t border-slate-50">
 
         <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">
-          EXP: ${item.expired}
+          EXP: ${formatDate(item.expired)}
         </div>
 
         <div class="flex gap-2">
@@ -435,7 +447,8 @@ function editItem(item) {
 
   document.getElementById('pic').value = item.pic;
 
-  document.getElementById('expiredDate').value = item.expired;
+  document.getElementById('expiredDate').value =
+    item.expired.split('T')[0];
 
   document.getElementById('edit-timestamp').value = item.timestamp;
 
