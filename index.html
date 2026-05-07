@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Expired Tracker</title>
+  <title>EXPIRED TRACKER MCT</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,25 +13,45 @@
 
     body{
       font-family:'Plus Jakarta Sans',sans-serif;
+      background:#f8fafc;
+    }
+
+    .aeon-gradient{
+      background:linear-gradient(135deg,#C6007E,#e60093);
+    }
+
+    .glass{
+      backdrop-filter:blur(10px);
     }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 min-h-screen pb-24">
+<body class="text-slate-900 min-h-screen pb-24">
 
 <div class="max-w-md mx-auto">
 
 <!-- HEADER -->
 
-<header class="bg-blue-600 text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-xl text-center">
+<header class="aeon-gradient text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-2xl text-center relative overflow-hidden">
 
-  <h1 class="text-2xl font-extrabold tracking-tight">
-    EXPIRED TRACKER
-  </h1>
+  <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full"></div>
+  <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-white/10 rounded-full"></div>
 
-  <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">
-    Manajemen Stok Mobile
-  </p>
+  <div class="relative z-10">
+
+    <div class="text-xs font-black tracking-[0.3em] opacity-80">
+      AEON
+    </div>
+
+    <h1 class="text-3xl font-extrabold tracking-tight mt-1">
+      EXPIRED TRACKER MCT
+    </h1>
+
+    <p class="text-pink-100 text-xs font-bold uppercase tracking-[0.25em] mt-2">
+      AEON STORE CITRA RAYA
+    </p>
+
+  </div>
 
 </header>
 
@@ -40,20 +60,20 @@
 
 <div class="px-5 -mt-6 mb-4">
 
-  <div class="flex bg-white p-1 rounded-2xl shadow-lg border border-slate-200">
+  <div class="flex bg-white p-1 rounded-2xl shadow-xl border border-slate-200 glass">
 
     <button onclick="switchView('dashboard')" id="tab-dashboard"
-      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md">
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md transition-all">
       Dashboard
     </button>
 
     <button onclick="switchView('input')" id="tab-input"
-      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400 transition-all">
       Input
     </button>
 
     <button onclick="switchView('history')" id="tab-history"
-      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
+      class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400 transition-all">
       Riwayat
     </button>
 
@@ -76,7 +96,7 @@
       </div>
 
       <div id="statToday"
-        class="mt-2 text-3xl font-extrabold text-blue-600">
+        class="mt-2 text-3xl font-extrabold text-[#C6007E]">
         0
       </div>
 
@@ -143,7 +163,7 @@
         id="searchInput"
         oninput="handleSearch()"
         placeholder="Ketik minimal 2 huruf..."
-        class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-xl outline-none font-bold text-slate-700">
+        class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-[#C6007E] rounded-xl outline-none font-bold text-slate-700">
 
       <div
         id="dropdown"
@@ -158,19 +178,19 @@
   <form id="inputForm"
     class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all">
 
-    <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+    <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100">
 
-      <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">
+      <p class="text-[10px] font-black text-pink-500 uppercase tracking-widest">
         Detail Item
       </p>
 
       <div id="display-sku"
-        class="font-extrabold text-blue-900 text-lg leading-tight mt-1">
+        class="font-extrabold text-[#C6007E] text-lg leading-tight mt-1">
         ---
       </div>
 
       <div id="display-desc"
-        class="text-xs text-blue-600 font-medium mt-1 italic leading-tight">
+        class="text-xs text-pink-700 font-medium mt-1 italic leading-tight">
         Silakan pilih dari pencarian
       </div>
 
@@ -227,7 +247,7 @@
         type="date"
         id="expiredDate"
         required
-        class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900 outline-none">
+        class="w-full p-4 bg-pink-50 border-2 border-pink-100 rounded-2xl font-black text-[#C6007E] outline-none">
 
     </div>
 
@@ -235,7 +255,7 @@
     <button
       type="submit"
       id="btnSubmit"
-      class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-extrabold text-lg shadow-lg">
+      class="w-full py-5 bg-[#C6007E] hover:bg-[#a00067] text-white rounded-2xl font-extrabold text-lg shadow-lg transition-all">
 
       <span id="btn-text">
         SIMPAN DATA
@@ -272,7 +292,7 @@
 
     <button
       onclick="loadHistory()"
-      class="text-[10px] font-bold text-blue-600 uppercase">
+      class="text-[10px] font-bold text-[#C6007E] uppercase">
       Refresh
     </button>
 
@@ -348,20 +368,20 @@ function switchView(v) {
 
   document.getElementById('tab-dashboard').className =
     v === 'dashboard'
-    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
-    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md transition-all"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400 transition-all";
 
 
   document.getElementById('tab-input').className =
     v === 'input'
-    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
-    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md transition-all"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400 transition-all";
 
 
   document.getElementById('tab-history').className =
     v === 'history'
-    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md"
-    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+    ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md transition-all"
+    : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400 transition-all";
 
 }
 
@@ -375,7 +395,7 @@ function handleSearch() {
 
   const dd = document.getElementById('dropdown');
 
-  if (q.length < 2) {
+  if(q.length < 2){
 
     dd.classList.add('hidden');
 
@@ -394,9 +414,9 @@ function handleSearch() {
 
       <div
         onclick="selectItem('${i.sku}','${i.desc.replace(/'/g, "\\'")}')"
-        class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col">
+        class="p-4 border-b border-slate-50 hover:bg-pink-50 cursor-pointer flex flex-col">
 
-        <span class="font-black text-blue-700 text-sm">
+        <span class="font-black text-[#C6007E] text-sm">
           ${i.sku}
         </span>
 
@@ -479,7 +499,7 @@ function renderHistory(data){
 
         <div>
 
-          <div class="text-[10px] font-black text-blue-500 uppercase tracking-tighter">
+          <div class="text-[10px] font-black text-[#C6007E] uppercase tracking-tighter">
             ${item.sku}
           </div>
 
@@ -583,11 +603,9 @@ function updateDashboard(data){
 
   });
 
-  document.getElementById('statToday').innerText =
-    todayCount;
+  document.getElementById('statToday').innerText = todayCount;
 
-  document.getElementById('statExpired').innerText =
-    expiredToday;
+  document.getElementById('statExpired').innerText = expiredToday;
 
 
   let topPic = "-";
@@ -605,8 +623,7 @@ function updateDashboard(data){
 
   }
 
-  document.getElementById('topPic').innerText =
-    topPic;
+  document.getElementById('topPic').innerText = topPic;
 
 
   const labels = Object.keys(chartMap).slice(-7);
@@ -632,7 +649,10 @@ function updateDashboard(data){
       datasets:[{
         label:'Input',
         data:values,
-        tension:0.4
+        tension:0.4,
+        borderColor:'#C6007E',
+        backgroundColor:'rgba(198,0,126,0.1)',
+        fill:true
       }]
     },
 
@@ -656,23 +676,17 @@ function editItem(item){
 
   switchView('input');
 
-  document.getElementById('display-sku').innerText =
-    item.sku;
+  document.getElementById('display-sku').innerText = item.sku;
 
-  document.getElementById('display-desc').innerText =
-    item.desc;
+  document.getElementById('display-desc').innerText = item.desc;
 
-  document.getElementById('val-sku').value =
-    item.sku;
+  document.getElementById('val-sku').value = item.sku;
 
-  document.getElementById('val-desc').value =
-    item.desc;
+  document.getElementById('val-desc').value = item.desc;
 
-  document.getElementById('qty').value =
-    item.qty;
+  document.getElementById('qty').value = item.qty;
 
-  document.getElementById('pic').value =
-    item.pic;
+  document.getElementById('pic').value = item.pic;
 
   document.getElementById('expiredDate').value =
     item.expired.split('T')[0];
@@ -708,8 +722,7 @@ function cancelEdit(){
   document.getElementById('inputForm')
     .classList.add('opacity-40','pointer-events-none');
 
-  document.getElementById('display-sku').innerText =
-    "---";
+  document.getElementById('display-sku').innerText = "---";
 
   document.getElementById('display-desc').innerText =
     "Silakan pilih dari pencarian";
@@ -783,7 +796,7 @@ async function(e){
 
   };
 
-  showNotif("Menyimpan...","blue");
+  showNotif("Menyimpan...","pink");
 
   await fetch(API_URL,{
     method:"POST",
