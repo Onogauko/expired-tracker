@@ -1,9 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expired Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .sync-indicator {
+      width: 12px; height: 12px; border: 2px solid #3b82f6; border-top: 2px solid transparent;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
 </head>
-<body>
-  <h1>WEBAPP BERHASIL 🎉</h1>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-20">
+  <div class="max-w-md mx-auto">
+    <!-- Header Aplikasi -->
+    <header class="bg-blue-600 text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-xl text-center">
+      <h1 class="text-2xl font-extrabold tracking-tight">EXPIRED TRACKER</h1>
+      <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">Manajemen Stok Mobile</p>
+    </header>
+
+    <!-- Navigasi Tab -->
+    <div class="px-5 -mt-6 mb-4">
+      <div class="flex bg-white p-1 rounded-2xl shadow-lg border border-slate-200">
+        <button onclick="switchView('input')" id="tab-input" class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all bg-blue-600 text-white shadow-md">Input</button>
+        <button onclick="switchView('history')" id="tab-history" class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all text-slate-400">Riwayat</button>
+      </div>
+    </div>
+
+    <!-- VIEW: INPUT -->
+    <div id="view-input" class="p-5 space-y-6">
+      <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">Cari Nama / SKU Barang</label>
+        <div class="relative">
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Ketik minimal 2 huruf..." 
+            class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-xl outline-none font-bold text-slate-700 transition-all">
+          <div id="dropdown" class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 hidden max-h-60 overflow-y-auto"></div>
+        </div>
+      </div>
+
+      <form id="inputForm" class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all duration-300">
+        <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100">
+          <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Detail Item</p>
+          <div id="display-sku" class="font-extrabold text-blue-900 text-lg leading-tight mt-1">---</div>
+          <div id="display-desc" class="text-xs text-blue-600 font-medium mt-1 italic leading-tight">Silakan pilih dari pencarian</div>
+          <input type="hidden" id="val-sku">
+          <input type="hidden" id="val-desc">
+          <input type="hidden" id="edit-timestamp">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Qty</label>
+            <input type="number" id="qty" required placeholder="0" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none font-bold">
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PIC</label>
+            <input type="text" id="pic" required placeholder="Nama" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none font-bold uppercase">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expired Date</label>
+          <input type="date" id="expiredDate" required class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900 outline-none focus:border-blue-500">
+        </div>
+
+        <button type="submit" id="btnSubmit" class="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-extrabold text-lg shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3">
+          <span id="btn-text">SIMPAN DATA</span>
+        </button>
+        <button type="button" id="btnCancelEdit" onclick="cancelEdit()" class="hidden w-full py-3 text-xs font-bold text-slate-400 uppercase">Batal Edit</button>
+      </form>
+    </div>
+
+    <!-- VIEW: HISTORY -->
+    <div id="view-history" class="hidden p-5 space-y-4">
+      <div class="flex justify-between items-center px-2">
+        <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">Riwayat</h2>
+        <button onclick="loadHistory()" class="text-[10px] font-bold text-blue-600 uppercase">Refresh</button>
+      </div>
+      <div id="history-list" class="space-y-3"></div>
+    </div>
+
+    <div id="notif" class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl"></div>
+    <div id="syncStatus" class="hidden flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest py-2">
+      <div class="sync-indicator"></div><span>Sinkronisasi...</span>
+    </div>
+  </div>
+
+  <script>
+    let masterData = [];
+    window.onload = function() { fetchMaster(); loadHistory(); };
+
+    function switchView(v) {
+      document.getElementById('view-input').classList.toggle('hidden', v !== 'input');
+      document.getElementById('view-history').classList.toggle('hidden', v !== 'history');
+      document.getElementById('tab-input').className = v === 'input' ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md" : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+      document.getElementById('tab-history').className = v === 'history' ? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-blue-600 text-white shadow-md" : "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
+      if(v === 'history') loadHistory();
+    }
+
+    function fetchMaster() { if (typeof google !== 'undefined') google.script.run.withSuccessHandler(d => masterData = d).getMasterData(); }
+    function loadHistory() { if (typeof google !== 'undefined') google.script.run.withSuccessHandler(renderHistory).getHistoryData(); }
+
+    function renderHistory(data) {
+      const list = document.getElementById('history-list');
+      if (!data || data.length === 0) { list.innerHTML = '<div class="text-center py-10 text-slate-400 text-xs font-medium">Belum ada data.</div>'; return; }
+      list.innerHTML = data.map(item => `
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-2">
+          <div class="flex justify-between items-start">
+            <div><div class="text-[10px] font-black text-blue-500 uppercase tracking-tighter">${item.sku}</div><div class="text-sm font-bold text-slate-800 leading-tight">${item.desc}</div></div>
+            <div class="text-right"><div class="text-[10px] font-bold text-slate-400 uppercase">${item.pic}</div><div class="text-[10px] font-black text-slate-900">QTY: ${item.qty}</div></div>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-slate-50">
+            <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">EXP: ${item.expired}</div>
+            <div class="flex gap-2">
+              <button onclick='editItem(${JSON.stringify(item)})' class="px-3 py-1 bg-slate-100 text-[9px] font-black uppercase rounded-lg text-slate-600">Edit</button>
+              <button onclick="deleteItem('${item.timestamp}')" class="px-3 py-1 bg-red-50 text-[9px] font-black uppercase rounded-lg text-red-500">Hapus</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function handleSearch() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const dd = document.getElementById('dropdown');
+      if (q.length < 2) { dd.classList.add('hidden'); return; }
+      const f = masterData.filter(i => i.sku.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)).slice(0, 6);
+      if (f.length > 0) {
+        dd.innerHTML = f.map(i => `<div onclick="selectItem('${i.sku}', '${i.desc.replace(/'/g, "\\'")}')" class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col"><span class="font-black text-blue-700 text-sm">${i.sku}</span><span class="text-xs text-slate-500 font-medium truncate">${i.desc}</span></div>`).join('');
+        dd.classList.remove('hidden');
+      } else { dd.classList.add('hidden'); }
+    }
+
+    function selectItem(s, d) {
+      document.getElementById('display-sku').innerText = s;
+      document.getElementById('display-desc').innerText = d;
+      document.getElementById('val-sku').value = s;
+      document.getElementById('val-desc').value = d;
+      document.getElementById('dropdown').classList.add('hidden');
+      document.getElementById('searchInput').value = '';
+      document.getElementById('inputForm').classList.remove('opacity-40', 'pointer-events-none');
+    }
+
+    function editItem(item) {
+      switchView('input');
+      document.getElementById('display-sku').innerText = item.sku;
+      document.getElementById('display-desc').innerText = item.desc;
+      document.getElementById('val-sku').value = item.sku;
+      document.getElementById('val-desc').value = item.desc;
+      document.getElementById('qty').value = item.qty;
+      document.getElementById('pic').value = item.pic;
+      document.getElementById('expiredDate').value = item.expired;
+      document.getElementById('edit-timestamp').value = item.timestamp;
+      document.getElementById('btn-text').innerText = "UPDATE DATA";
+      document.getElementById('btnSubmit').classList.replace('bg-blue-600', 'bg-orange-500');
+      document.getElementById('btnCancelEdit').classList.remove('hidden');
+      document.getElementById('inputForm').classList.remove('opacity-40', 'pointer-events-none');
+    }
+
+    function cancelEdit() {
+      document.getElementById('inputForm').reset();
+      document.getElementById('edit-timestamp').value = "";
+      document.getElementById('btn-text').innerText = "SIMPAN DATA";
+      document.getElementById('btnSubmit').classList.replace('bg-orange-500', 'bg-blue-600');
+      document.getElementById('btnCancelEdit').classList.add('hidden');
+      document.getElementById('inputForm').classList.add('opacity-40', 'pointer-events-none');
+      document.getElementById('display-sku').innerText = "---";
+      document.getElementById('display-desc').innerText = "Silakan pilih dari pencarian";
+    }
+
+    function deleteItem(ts) {
+      if(!confirm("Hapus data riwayat ini?")) return;
+      showNotif("Menghapus...", "blue");
+      if (typeof google !== 'undefined') google.script.run.withSuccessHandler(() => { showNotif("Berhasil dihapus", "emerald"); loadHistory(); }).deleteHistoryItem(ts);
+    }
+
+    function showNotif(m, c) {
+      const n = document.getElementById('notif');
+      n.className = `fixed bottom-8 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[100] text-white font-bold text-sm text-center bg-${c}-500`;
+      n.innerText = m; n.classList.remove('hidden');
+      setTimeout(() => n.classList.add('hidden'), 3000);
+    }
+
+    document.getElementById('inputForm').onsubmit = function(e) {
+      e.preventDefault();
+      const ts = document.getElementById('edit-timestamp').value;
+      
+      // Memastikan SKU dikirim dengan prefix petik agar nol di depan tidak hilang di Sheets
+      const rawSku = document.getElementById('val-sku').value;
+      const formattedSku = rawSku.startsWith("'") ? rawSku : "'" + rawSku;
+
+      const data = {
+        sku: formattedSku,
+        desc: document.getElementById('val-desc').value,
+        qty: document.getElementById('qty').value,
+        pic: document.getElementById('pic').value,
+        expired: document.getElementById('expiredDate').value,
+        timestamp: ts || "" 
+      };
+      
+      const isEdit = ts !== "";
+      showNotif(isEdit ? "Memperbarui..." : "Menyimpan...", "blue");
+      document.getElementById('syncStatus').classList.remove('hidden');
+      cancelEdit();
+      if (typeof google !== 'undefined') {
+        google.script.run.withSuccessHandler(() => {
+          document.getElementById('syncStatus').classList.add('hidden');
+          showNotif("Data Berhasil Disimpan!", "emerald");
+          loadHistory();
+        }).submitData(data);
+      }
+      document.getElementById('searchInput').focus();
+    };
+  </script>
 </body>
 </html>
