@@ -1,9 +1,11 @@
+# FULL FINAL `index.html`
+
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>EXPIRED TRACKER MCT</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -27,30 +29,15 @@ body{
 
 <div class="max-w-md mx-auto">
 
-<!-- HEADER -->
-
 <header class="aeon-gradient text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-2xl text-center">
-
-<div class="text-xs font-black tracking-[0.3em] opacity-80">
-AEON
-</div>
-
-<h1 class="text-3xl font-extrabold mt-1">
-EXPIRED TRACKER MCT
-</h1>
-
+<div class="text-xs font-black tracking-[0.3em] opacity-80">AEON</div>
+<h1 class="text-3xl font-extrabold mt-1">EXPIRED TRACKER MCT</h1>
 <p class="text-pink-100 text-xs font-bold uppercase tracking-[0.25em] mt-2">
 AEON STORE CITRA RAYA
 </p>
-
 </header>
 
-
-
-<!-- TAB -->
-
 <div class="px-5 -mt-6 mb-4">
-
 <div class="flex bg-white p-1 rounded-2xl shadow-xl border border-slate-200">
 
 <button onclick="switchView('dashboard')" id="tab-dashboard"
@@ -69,292 +56,130 @@ Riwayat
 </button>
 
 </div>
-
 </div>
-
-
-
-<!-- DASHBOARD -->
 
 <div id="view-dashboard" class="p-5 space-y-5">
 
-<!-- ALERT -->
-
 <div class="bg-red-500 text-white rounded-3xl p-5 shadow-2xl">
-
 <div class="text-xs font-black uppercase tracking-widest opacity-80">
 Priority Alert
 </div>
-
-<div id="alertText"
-class="mt-2 text-2xl font-extrabold leading-tight">
+<div id="alertText" class="mt-2 text-2xl font-extrabold leading-tight">
 Tidak ada expired hari ini
 </div>
-
 </div>
 
-
-
-<!-- SUMMARY -->
-
 <div class="grid grid-cols-2 gap-4">
-
 <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
 <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
 Expired Hari Ini
 </div>
-
-<div id="statExpiredToday"
-class="mt-2 text-3xl font-extrabold text-red-500">
-0
+<div id="statExpiredToday" class="mt-2 text-3xl font-extrabold text-red-500">0</div>
 </div>
-
-</div>
-
-
 
 <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
 <div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
 Expired 7 Hari
 </div>
-
-<div id="statExpiredWeek"
-class="mt-2 text-3xl font-extrabold text-[#C6007E]">
-0
+<div id="statExpiredWeek" class="mt-2 text-3xl font-extrabold text-[#C6007E]">0</div>
 </div>
-
 </div>
-
-</div>
-
-
-
-<!-- FILTER -->
 
 <div class="flex gap-2 overflow-x-auto pb-1">
-
-<button onclick="filterExpired('today')"
-class="px-4 py-2 rounded-2xl bg-red-500 text-white text-xs font-black whitespace-nowrap">
-Hari Ini
-</button>
-
-<button onclick="filterExpired('tomorrow')"
-class="px-4 py-2 rounded-2xl bg-orange-500 text-white text-xs font-black whitespace-nowrap">
-Besok
-</button>
-
-<button onclick="filterExpired('week')"
-class="px-4 py-2 rounded-2xl bg-[#C6007E] text-white text-xs font-black whitespace-nowrap">
-7 Hari
-</button>
-
-<button onclick="filterExpired('month')"
-class="px-4 py-2 rounded-2xl bg-slate-700 text-white text-xs font-black whitespace-nowrap">
-30 Hari
-</button>
-
+<button onclick="filterExpired('today')" class="px-4 py-2 rounded-2xl bg-red-500 text-white text-xs font-black whitespace-nowrap">Hari Ini</button>
+<button onclick="filterExpired('tomorrow')" class="px-4 py-2 rounded-2xl bg-orange-500 text-white text-xs font-black whitespace-nowrap">Besok</button>
+<button onclick="filterExpired('week')" class="px-4 py-2 rounded-2xl bg-[#C6007E] text-white text-xs font-black whitespace-nowrap">7 Hari</button>
+<button onclick="filterExpired('month')" class="px-4 py-2 rounded-2xl bg-slate-700 text-white text-xs font-black whitespace-nowrap">30 Hari</button>
 </div>
 
-
-
-<!-- LIST -->
-
 <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
-<div id="dashboardTitle"
-class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
+<div id="dashboardTitle" class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
 Daftar Expired Hari Ini
 </div>
-
 <div id="expiredList" class="space-y-3"></div>
-
 </div>
 
-
-
-<!-- CHART -->
-
 <div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
 <div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
 Trend Expired
 </div>
-
 <canvas id="weeklyChart"></canvas>
-
 </div>
 
 </div>
-
-
-
-<!-- INPUT -->
 
 <div id="view-input" class="hidden p-5 space-y-6">
 
 <div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
-
 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">
 Cari Nama / SKU Barang
 </label>
 
 <div class="relative">
-
-<input
-type="text"
-id="searchInput"
-oninput="handleSearch()"
+<input type="text" id="searchInput" oninput="handleSearch()"
 placeholder="Ketik minimal 2 huruf..."
 class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-[#C6007E] rounded-xl outline-none font-bold text-slate-700">
 
-<div
-id="dropdown"
-class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 hidden max-h-60 overflow-y-auto">
+<div id="dropdown" class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 hidden max-h-60 overflow-y-auto"></div>
 </div>
-
 </div>
-
-</div>
-
-
 
 <form id="inputForm"
 class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all">
 
 <div class="p-4 bg-pink-50 rounded-2xl border border-pink-100">
-
-<p class="text-[10px] font-black text-pink-500 uppercase tracking-widest">
-Detail Item
-</p>
-
-<div id="display-sku"
-class="font-extrabold text-[#C6007E] text-lg mt-1">
----
-</div>
-
-<div id="display-desc"
-class="text-xs text-pink-700 font-medium mt-1 italic">
+<p class="text-[10px] font-black text-pink-500 uppercase tracking-widest">Detail Item</p>
+<div id="display-sku" class="font-extrabold text-[#C6007E] text-lg mt-1">---</div>
+<div id="display-desc" class="text-xs text-pink-700 font-medium mt-1 italic">
 Silakan pilih dari pencarian
 </div>
-
 <input type="hidden" id="val-sku">
 <input type="hidden" id="val-desc">
 <input type="hidden" id="edit-timestamp">
-
 </div>
-
-
 
 <div class="grid grid-cols-2 gap-4">
-
 <div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-Qty
-</label>
-
-<input
-type="number"
-id="qty"
-required
-placeholder="0"
+<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Qty</label>
+<input type="number" id="qty" required placeholder="0"
 class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
-
 </div>
 
-
-
 <div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-PIC
-</label>
-
-<input
-type="text"
-id="pic"
-required
-placeholder="Nama"
+<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PIC</label>
+<input type="text" id="pic" required placeholder="Nama"
 class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold uppercase">
-
 </div>
-
 </div>
-
-
 
 <div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-Expired Date
-</label>
-
-<input
-type="date"
-id="expiredDate"
-required
+<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Expired Date</label>
+<input type="date" id="expiredDate" required
 class="w-full p-4 bg-pink-50 border-2 border-pink-100 rounded-2xl font-black text-[#C6007E] outline-none">
-
 </div>
 
-
-
-<button
-type="submit"
-id="btnSubmit"
+<button type="submit" id="btnSubmit"
 class="w-full py-5 bg-[#C6007E] hover:bg-[#a00067] text-white rounded-2xl font-extrabold text-lg shadow-lg">
-
-<span id="btn-text">
-SIMPAN DATA
-</span>
-
+<span id="btn-text">SIMPAN DATA</span>
 </button>
 
-
-
-<button
-type="button"
-id="btnCancelEdit"
-onclick="cancelEdit()"
+<button type="button" id="btnCancelEdit" onclick="cancelEdit()"
 class="hidden w-full py-3 text-xs font-bold text-slate-400 uppercase">
-
 Batal Edit
-
 </button>
 
 </form>
-
 </div>
-
-
-
-<!-- HISTORY -->
 
 <div id="view-history" class="hidden p-5 space-y-4">
-
 <div class="flex justify-between items-center px-2">
-
-<h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">
-Riwayat
-</h2>
-
-<button
-onclick="loadHistory()"
-class="text-[10px] font-bold text-[#C6007E] uppercase">
+<h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">Riwayat</h2>
+<button onclick="loadHistory()" class="text-[10px] font-bold text-[#C6007E] uppercase">
 Refresh
 </button>
-
 </div>
-
 <div id="history-list" class="space-y-3"></div>
-
 </div>
-
-
-
-<!-- NOTIF -->
 
 <div id="notif"
 class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl">
@@ -362,93 +187,52 @@ class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bol
 
 </div>
 
-
-
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbx0TkK_9WokaWidnOpKj5rCWQg_FWXk5l_DrqKsceMgh_ESO56V2QIj5BM3hUlk-vMZWg/exec";
+const API_URL = "GANTI_DENGAN_WEBAPP_APPS_SCRIPT_KAMU";
 
 let masterData = [];
 let globalHistoryData = [];
 
 window.onload = function(){
-
 fetchMaster();
-
 loadHistory();
-
 };
 
-
-
 async function fetchMaster(){
-
 const res = await fetch(API_URL + "?action=master");
-
 masterData = await res.json();
-
 }
-
-
 
 async function loadHistory(){
-
 const res = await fetch(API_URL + "?action=history");
-
 const data = await res.json();
-
 globalHistoryData = data;
-
 renderHistory(data);
-
 updateDashboard(data);
-
 }
-
-
 
 function switchView(v){
 
-document.getElementById('view-dashboard')
-.classList.toggle('hidden', v !== 'dashboard');
+['dashboard','input','history'].forEach(id=>{
+document.getElementById('view-'+id).classList.toggle('hidden', id!==v);
+});
 
-document.getElementById('view-input')
-.classList.toggle('hidden', v !== 'input');
-
-document.getElementById('view-history')
-.classList.toggle('hidden', v !== 'history');
-
-document.getElementById('tab-dashboard').className =
-v === 'dashboard'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
-document.getElementById('tab-input').className =
-v === 'input'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
-document.getElementById('tab-history').className =
-v === 'history'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
+['dashboard','input','history'].forEach(id=>{
+document.getElementById('tab-'+id).className =
+id===v
+? 'flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md'
+: 'flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400';
+});
 }
 
-
-
 function handleSearch(){
-
 const q = document.getElementById('searchInput').value.toLowerCase();
-
 const dd = document.getElementById('dropdown');
 
 if(q.length < 2){
-
 dd.classList.add('hidden');
-
 return;
-
 }
 
 const filtered = masterData.filter(i =>
@@ -459,205 +243,115 @@ i.desc.toLowerCase().includes(q)
 if(filtered.length > 0){
 
 dd.innerHTML = filtered.map(i => `
-
-<div
-onclick="selectItem('${i.sku}','${i.desc.replace(/'/g,"\\'")}')"
+<div onclick="selectItem('${i.sku}','${i.desc.replace(/'/g,"\\'")}')"
 class="p-4 border-b border-slate-50 hover:bg-pink-50 cursor-pointer">
-
-<div class="font-black text-[#C6007E] text-sm">
-${i.sku}
+<div class="font-black text-[#C6007E] text-sm">${i.sku}</div>
+<div class="text-xs text-slate-500 truncate">${i.desc}</div>
 </div>
-
-<div class="text-xs text-slate-500 truncate">
-${i.desc}
-</div>
-
-</div>
-
 `).join('');
 
 dd.classList.remove('hidden');
 
 }else{
-
 dd.classList.add('hidden');
-
 }
-
 }
-
-
 
 function selectItem(sku,desc){
-
 document.getElementById('display-sku').innerText = sku;
-
 document.getElementById('display-desc').innerText = desc;
-
 document.getElementById('val-sku').value = sku;
-
 document.getElementById('val-desc').value = desc;
-
 document.getElementById('dropdown').classList.add('hidden');
-
 document.getElementById('searchInput').value = '';
-
-document.getElementById('inputForm')
-.classList.remove('opacity-40','pointer-events-none');
-
+document.getElementById('inputForm').classList.remove('opacity-40','pointer-events-none');
 }
 
-
-
 function formatDate(dateString){
-
 const d = new Date(dateString);
-
 return d.toLocaleDateString('id-ID',{
 day:'2-digit',
 month:'2-digit',
 year:'numeric'
 });
-
 }
 
-
-
 function renderHistory(data){
-
 const list = document.getElementById('history-list');
 
 if(!data || data.length === 0){
-
-list.innerHTML = `
-<div class="text-center py-10 text-slate-400 text-xs font-medium">
-Belum ada data.
-</div>
-`;
-
+list.innerHTML = '<div class="text-center py-10 text-slate-400 text-xs font-medium">Belum ada data.</div>';
 return;
-
 }
 
 list.innerHTML = data.map(item => `
-
 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-
 <div class="flex justify-between items-start">
-
 <div>
-
-<div class="text-[10px] font-black text-[#C6007E] uppercase">
-${item.sku}
+<div class="text-[10px] font-black text-[#C6007E] uppercase">${item.sku}</div>
+<div class="text-sm font-bold text-slate-800">${item.desc}</div>
 </div>
-
-<div class="text-sm font-bold text-slate-800">
-${item.desc}
-</div>
-
-</div>
-
 <div class="text-right">
-
-<div class="text-[10px] font-bold text-slate-400 uppercase">
-${item.pic}
+<div class="text-[10px] font-bold text-slate-400 uppercase">${item.pic}</div>
+<div class="text-[10px] font-black">QTY: ${item.qty}</div>
 </div>
-
-<div class="text-[10px] font-black">
-QTY: ${item.qty}
-</div>
-
-</div>
-
 </div>
 
 <div class="flex justify-between items-center pt-2 mt-2 border-t border-slate-50">
-
 <div class="text-[10px] font-bold text-red-500 uppercase">
 EXP: ${formatDate(item.expired)}
 </div>
 
 <div class="flex gap-2">
-
-<button
-onclick='editItem(${JSON.stringify(item)})'
+<button onclick='editItem(${JSON.stringify(item)})'
 class="px-3 py-1 bg-slate-100 text-[9px] font-black uppercase rounded-lg">
 Edit
 </button>
 
-<button
-onclick="deleteItem('${item.timestamp}')"
+<button onclick="deleteItem('${item.timestamp}')"
 class="px-3 py-1 bg-red-50 text-red-500 text-[9px] font-black uppercase rounded-lg">
 Hapus
 </button>
-
 </div>
-
 </div>
-
 </div>
-
 `).join('');
-
 }
 
-
-
 function updateDashboard(data){
-
 const today = new Date();
-
 let todayCount = 0;
 let weekCount = 0;
-
 const chartMap = {};
 
 data.forEach(item => {
-
 const expDate = new Date(item.expired);
+const diff = Math.ceil((expDate - today) / (1000*60*60*24));
 
-const diff = Math.ceil(
-(expDate - today) / (1000*60*60*24)
-);
-
-if(diff === 0){
-todayCount++;
-}
-
-if(diff >= 0 && diff <= 7){
-weekCount++;
-}
+if(diff === 0) todayCount++;
+if(diff >= 0 && diff <= 7) weekCount++;
 
 const key = expDate.toISOString().split('T')[0];
-
-if(!chartMap[key]){
-chartMap[key] = 0;
-}
-
+if(!chartMap[key]) chartMap[key] = 0;
 chartMap[key]++;
-
 });
 
 document.getElementById('statExpiredToday').innerText = todayCount;
-
 document.getElementById('statExpiredWeek').innerText = weekCount;
 
 document.getElementById('alertText').innerText =
 todayCount > 0
 ? `${todayCount} item expired hari ini`
-: `Tidak ada expired hari ini`;
+: 'Tidak ada expired hari ini';
 
 filterExpired('today');
 
 const labels = Object.keys(chartMap).slice(-7);
-
 const values = Object.values(chartMap).slice(-7);
 
 const ctx = document.getElementById('weeklyChart').getContext('2d');
 
-if(window.myChart){
-window.myChart.destroy();
-}
+if(window.myChart) window.myChart.destroy();
 
 window.myChart = new Chart(ctx,{
 type:'bar',
@@ -671,53 +365,40 @@ backgroundColor:'#C6007E'
 },
 options:{
 plugins:{
-legend:{
-display:false
-}
+legend:{display:false}
 }
 }
 });
-
 }
 
-
-
 function filterExpired(type){
-
 const now = new Date();
-
 let filtered = [];
-
-let title = "";
+let title = '';
 
 filtered = globalHistoryData.filter(item => {
-
 const exp = new Date(item.expired);
-
-const diff = Math.ceil(
-(exp - now) / (1000*60*60*24)
-);
+const diff = Math.ceil((exp - now) / (1000*60*60*24));
 
 if(type === 'today'){
-title = "Daftar Expired Hari Ini";
+title = 'Daftar Expired Hari Ini';
 return diff === 0;
 }
 
 if(type === 'tomorrow'){
-title = "Daftar Expired Besok";
+title = 'Daftar Expired Besok';
 return diff === 1;
 }
 
 if(type === 'week'){
-title = "Daftar Expired 7 Hari";
+title = 'Daftar Expired 7 Hari';
 return diff >= 0 && diff <= 7;
 }
 
 if(type === 'month'){
-title = "Daftar Expired 30 Hari";
+title = 'Daftar Expired 30 Hari';
 return diff >= 0 && diff <= 30;
 }
-
 });
 
 document.getElementById('dashboardTitle').innerText = title;
@@ -725,61 +406,30 @@ document.getElementById('dashboardTitle').innerText = title;
 const list = document.getElementById('expiredList');
 
 if(filtered.length === 0){
-
-list.innerHTML = `
-<div class="text-center py-10 text-slate-400 text-xs font-bold">
-Tidak ada data
-</div>
-`;
-
+list.innerHTML = '<div class="text-center py-10 text-slate-400 text-xs font-bold">Tidak ada data</div>';
 return;
-
 }
 
 list.innerHTML = filtered.map(item => `
-
 <div class="border border-slate-100 rounded-2xl p-4 flex justify-between">
-
 <div>
-
-<div class="text-[10px] uppercase font-black tracking-widest text-[#C6007E]">
-${item.sku}
-</div>
-
-<div class="font-extrabold text-sm text-slate-800 mt-1">
-${item.desc}
-</div>
-
+<div class="text-[10px] uppercase font-black tracking-widest text-[#C6007E]">${item.sku}</div>
+<div class="font-extrabold text-sm text-slate-800 mt-1">${item.desc}</div>
 <div class="text-[10px] text-red-500 font-black uppercase mt-2">
 EXP: ${formatDate(item.expired)}
 </div>
-
 </div>
 
 <div class="text-right">
-
-<div class="text-[10px] uppercase font-bold text-slate-400">
-${item.pic}
+<div class="text-[10px] uppercase font-bold text-slate-400">${item.pic}</div>
+<div class="mt-1 text-sm font-black">QTY ${item.qty}</div>
 </div>
-
-<div class="mt-1 text-sm font-black">
-QTY ${item.qty}
 </div>
-
-</div>
-
-</div>
-
 `).join('');
-
 }
 
-
-
 function editItem(item){
-
 switchView('input');
-
 document.getElementById('display-sku').innerText = item.sku;
 document.getElementById('display-desc').innerText = item.desc;
 document.getElementById('val-sku').value = item.sku;
@@ -788,98 +438,97 @@ document.getElementById('qty').value = item.qty;
 document.getElementById('pic').value = item.pic;
 document.getElementById('expiredDate').value = item.expired.split('T')[0];
 document.getElementById('edit-timestamp').value = item.timestamp;
-
-document.getElementById('btn-text').innerText = "UPDATE DATA";
-
-document.getElementById('btnCancelEdit')
-.classList.remove('hidden');
-
-document.getElementById('inputForm')
-.classList.remove('opacity-40','pointer-events-none');
-
+document.getElementById('btn-text').innerText = 'UPDATE DATA';
+document.getElementById('btnCancelEdit').classList.remove('hidden');
+document.getElementById('inputForm').classList.remove('opacity-40','pointer-events-none');
 }
-
-
 
 function cancelEdit(){
-
 document.getElementById('inputForm').reset();
-
-document.getElementById('edit-timestamp').value = "";
-
-document.getElementById('btn-text').innerText = "SIMPAN DATA";
-
-document.getElementById('btnCancelEdit')
-.classList.add('hidden');
-
-document.getElementById('inputForm')
-.classList.add('opacity-40','pointer-events-none');
-
-document.getElementById('display-sku').innerText = "---";
-
-document.getElementById('display-desc').innerText =
-"Silakan pilih dari pencarian";
-
+document.getElementById('edit-timestamp').value = '';
+document.getElementById('btn-text').innerText = 'SIMPAN DATA';
+document.getElementById('btnCancelEdit').classList.add('hidden');
+document.getElementById('inputForm').classList.add('opacity-40','pointer-events-none');
+document.getElementById('display-sku').innerText = '---';
+document.getElementById('display-desc').innerText = 'Silakan pilih dari pencarian';
 }
 
-
-
 async function deleteItem(timestamp){
+if(!confirm('Hapus data ini?')) return;
 
-if(!confirm("Hapus data ini?")) return;
+showNotif('Menghapus data...', 'blue');
 
 await fetch(API_URL,{
-method:"POST",
+method:'POST',
 body:JSON.stringify({
-action:"delete",
+action:'delete',
 timestamp:timestamp
 })
 });
 
-loadHistory();
+showNotif('Berhasil dihapus!', 'emerald');
 
+loadHistory();
 }
 
-
-
-document.getElementById('inputForm').onsubmit =
-async function(e){
+document.getElementById('inputForm').onsubmit = async function(e){
 
 e.preventDefault();
 
-const timestamp =
-document.getElementById('edit-timestamp').value;
+showNotif('Menyimpan data...', 'blue');
+
+document.getElementById('btnSubmit').disabled = true;
+
+const timestamp = document.getElementById('edit-timestamp').value;
 
 const data = {
-
-action: timestamp ? "edit" : "save",
-
+action: timestamp ? 'edit' : 'save',
 timestamp: timestamp,
-
 sku: document.getElementById('val-sku').value,
-
 desc: document.getElementById('val-desc').value,
-
 qty: document.getElementById('qty').value,
-
 pic: document.getElementById('pic').value,
-
 expired: document.getElementById('expiredDate').value
-
 };
 
+try {
+
 await fetch(API_URL,{
-method:"POST",
+method:'POST',
 body:JSON.stringify(data)
 });
+
+showNotif('Berhasil disimpan!', 'emerald');
 
 cancelEdit();
 
 loadHistory();
 
+}catch(err){
+showNotif('Gagal menyimpan data!', 'red');
+console.log(err);
+}
+
+document.getElementById('btnSubmit').disabled = false;
 };
+
+function showNotif(message, color){
+const notif = document.getElementById('notif');
+
+notif.className =
+`fixed bottom-6 left-6 right-6 p-4 rounded-2xl text-white font-bold text-sm text-center z-[100] shadow-2xl bg-${color}-500`;
+
+notif.innerText = message;
+
+notif.classList.remove('hidden');
+
+setTimeout(()=>{
+notif.classList.add('hidden');
+},2500);
+}
 
 </script>
 
 </body>
 </html>
+```
