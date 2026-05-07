@@ -824,26 +824,24 @@ document.getElementById('display-desc').innerText =
 
 
 
-async function deleteItem(timestamp) {
-  if(!confirm("Hapus data ini?")) return;
-
-  // Tambahkan notifikasi agar tahu proses sedang jalan
-  showNotif("Menghapus data...", "blue");
+async function deleteItem(item) { // Terima objek 'item' lengkap, bukan cuma timestamp
+  if (!confirm("Hapus data ini?")) return;
+  
+  if (typeof showNotif === "function") showNotif("Menghapus...", "blue");
 
   try {
     await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({
         action: "delete",
-        timestamp: timestamp
+        timestamp: item.timestamp,
+        sku: item.sku,
+        qty: item.qty
       })
     });
-
-    showNotif("Berhasil dihapus!", "emerald");
-    loadHistory(); // Refresh data setelah hapus
-  } catch (error) {
-    showNotif("Gagal menghapus!", "red");
-    console.error(error);
+    loadHistory();
+  } catch (e) {
+    alert("Gagal: " + e.message);
   }
 }
 
