@@ -866,22 +866,17 @@ pic: document.getElementById('pic').value,
 
 expired: document.getElementById('expiredDate').value
 
-showNotif("Menyimpan data...", "blue");
-
-document.getElementById('btnSubmit').disabled = true;
+};
 
 await fetch(API_URL,{
 method:"POST",
 body:JSON.stringify(data)
 });
 
-showNotif("Berhasil disimpan!", "emerald");
-
-document.getElementById('btnSubmit').disabled = false;
-
 cancelEdit();
 
 loadHistory();
+
 };
 
 </script>
