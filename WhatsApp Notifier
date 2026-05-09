@@ -1,0 +1,122 @@
+const axios = require('axios');
+const admin = require('firebase-admin');
+
+// Konfigurasi Firebase Admin (Akses langsung ke Firestore)
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
+async function sendNotification() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const alertDays = [90, 60, 30, 15, 14, 10, 9, 8, 7, 6, 5, 4, 3, 1, 0];
+    const snapshot = await db.collection('inventory_expired').get();
+
+    console.log(`Mengecek ${snapshot.size} data inventory...`);
+
+    for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const expDate = new Date(data.expiredDate);
+        const diffTime = expDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (alertDays.includes(diffDays)) {
+            const flagKey = `h${diffDays}`;
+            
+            // Cek apakah notifikasi untuk hari ini sudah pernah dikirim
+            if (!data.notificationFlags || !data.notificationFlags[flagKey]) {
+                
+                const message = `⚠️ *EXPIRY ALERT H-${diffDays}*\n\n` +
+                                `📦 *Produk:* ${data.itemDescription}\n` +
+                                `🔢 *SKU:* ${data.sku}\n` +
+                                `📊 *Qty:* ${data.qty}\n` +
+                                `📅 *Exp:* ${data.expiredDate}\n` +
+                                `👤 *PIC:* ${data.pic}\n\n` +
+                                `Mohon segera lakukan pengecekan stok!`;
+
+                try {
+                    await axios.post('https://api.fonnte.com/send', {
+                        target: process.env.WA_TARGET,
+                        message: message,
+                    }, {
+                        headers: { 'Authorization': process.env.FONNTE_TOKEN }
+                    });
+
+                    // Update database agar tidak kirim ulang untuk hari ini
+                    await doc.ref.update({
+                        [`notificationFlags.${flagKey}`]: true
+                    });
+                    
+                    console.log(`✅ Terkirim H-${diffDays} untuk ${data.sku}`);
+                } catch (err) {
+                    console.error(`❌ Gagal kirim WA:`, err.response?.data || err.message);
+                }
+            }
+        }
+    }
+}
+
+sendNotification();
+```
+eof
+
+---
+
+### Langkah 4: Buat Jadwal Otomatis (`daily-wa.yml`)
+Agar file di atas berjalan otomatis setiap jam 8 pagi, kita buat jadwalnya.
+1.  Di GitHub, klik **Add file** > **Create new file**.
+2.  Beri nama (copy-paste lengkap): **`.github/workflows/daily-wa.yml`**
+3.  Isi dengan kode berikut:
+
+```yaml:Github Workflow:daily-wa.yml
+name: Daily WhatsApp Expiry Notification
+
+on:
+  schedule:
+    # Berjalan setiap hari jam 01:00 UTC (jam 08:00 WIB)
+    - cron: '0 1 * * *'
+  workflow_dispatch: # Memungkinkan kita menjalankan manual untuk tes
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install dependencies
+        run: npm install axios firebase-admin
+      - name: Run Notifier
+        env:
+          FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
+          WA_TARGET: ${{ secrets.WA_TARGET }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node notify.js
+```
+eof
+
+---
+
+### Langkah 5: Cara Mendapatkan `FIREBASE_SERVICE_ACCOUNT`
+Langkah ini sangat penting agar robot GitHub bisa masuk ke Firebase Anda:
+1.  Buka [Firebase Console](https://console.firebase.google.com/).
+2.  Klik ikon **Gerigi (Project Settings)** > **Service accounts**.
+3.  Klik tombol **Generate new private key**.
+4.  File `.json` akan terdownload. Buka file itu dengan Notepad, copy semua isinya.
+5.  Kembali ke GitHub Secrets (Langkah 2), tambah secret baru bernama `FIREBASE_SERVICE_ACCOUNT` dan paste isinya di sana.
+
+### Cara Tes Sekarang:
+Anda tidak perlu menunggu besok pagi. 
+1.  Di GitHub, klik tab **Actions**.
+2.  Klik **Daily WhatsApp Expiry Notification** di sebelah kiri.
+3.  Klik tombol **Run workflow** > **Run workflow**.
+4.  Lihat prosesnya. Jika berhasil, pesan WA akan langsung masuk ke HP Anda untuk barang-barang yang mendekati tanggal expired sesuai kriteria H-90 sampai H-0!
+
+**Tips:** Pastikan format tanggal di `inventory_expired` adalah `YYYY-MM-DD` (sudah otomatis jika Anda menggunakan aplikasi yang kita buat sebelumnya).
