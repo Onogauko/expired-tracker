@@ -1,0 +1,22 @@
+{
+"name": "Expired Tracker Pro",
+"short_name": "ExpTracker",
+"description": "Aplikasi Monitoring Expired Product",
+"start_url": "/index.html",
+"display": "standalone",
+"background_color": "#2563eb",
+"theme_color": "#2563eb",
+"icons": [
+{
+"src": "https://cdn-icons-png.flaticon.com/512/2907/2907150.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any maskable"
+},
+{
+"src": "https://cdn-icons-png.flaticon.com/512/2907/2907150.png",
+"sizes": "192x192",
+"type": "image/png"
+}
+]
+}
