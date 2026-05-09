@@ -3,11 +3,9 @@
     with:
       node-version: '16'
       
-  /* STREAMING_CHUNK:Installing required libraries... */
   - name: Install dependencies
     run: npm install axios firebase-admin
     
-  /* STREAMING_CHUNK:Running the notification script... */
   - name: Run Notifier
     env:
       FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
