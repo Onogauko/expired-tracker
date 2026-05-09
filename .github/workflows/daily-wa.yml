@@ -1,3 +1,4 @@
+<!-- STREAMING_CHUNK:Setting up environment... -->
   - name: Setup Node.js
     uses: actions/setup-node@v3
     with:
@@ -6,6 +7,7 @@
   - name: Install dependencies
     run: npm install axios firebase-admin
     
+  <!-- STREAMING_CHUNK:Executing the notification robot... -->
   - name: Run Notifier
     env:
       FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
