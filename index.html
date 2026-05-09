@@ -1,854 +1,426 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Expired Tracker Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2563eb">
 
-<title>EXPIRED TRACKER MCT</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-
-body{
-  font-family:'Plus Jakarta Sans',sans-serif;
-  background:#f8fafc;
-}
-
-.aeon-gradient{
-  background:linear-gradient(135deg,#C6007E,#e60093);
-}
-</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tab-active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .tab-inactive { color: #94a3b8; }
+        .hide { display: none !important; }
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator { display: block; cursor: pointer; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
 </head>
-
-<body class="min-h-screen pb-24 text-slate-900">
-
-<div class="max-w-md mx-auto">
-
-<!-- HEADER -->
-
-<header class="aeon-gradient text-white pt-8 pb-12 px-6 rounded-b-[2.5rem] shadow-2xl text-center">
-
-<div class="text-xs font-black tracking-[0.3em] opacity-80">
-AEON
-</div>
-
-<h1 class="text-3xl font-extrabold mt-1">
-EXPIRED TRACKER MCT
-</h1>
-
-<p class="text-pink-100 text-xs font-bold uppercase tracking-[0.25em] mt-2">
-AEON STORE CITRA RAYA
-</p>
-
-</header>
-
-
-
-<!-- TAB -->
-
-<div class="px-5 -mt-6 mb-4">
-
-<div class="flex bg-white p-1 rounded-2xl shadow-xl border border-slate-200">
-
-<button onclick="switchView('dashboard')" id="tab-dashboard"
-class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md">
-Dashboard
-</button>
-
-<button onclick="switchView('input')" id="tab-input"
-class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
-Input
-</button>
-
-<button onclick="switchView('history')" id="tab-history"
-class="flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400">
-Riwayat
-</button>
-
-</div>
-
-</div>
-
-
-
-<!-- DASHBOARD -->
-
-<div id="view-dashboard" class="p-5 space-y-5">
-
-<!-- ALERT -->
-
-<div class="bg-red-500 text-white rounded-3xl p-5 shadow-2xl">
-
-<div class="text-xs font-black uppercase tracking-widest opacity-80">
-Priority Alert
-</div>
-
-<div id="alertText"
-class="mt-2 text-2xl font-extrabold leading-tight">
-Tidak ada expired hari ini
-</div>
-
-</div>
-
-
-
-<!-- SUMMARY -->
-
-<div class="grid grid-cols-2 gap-4">
-
-<div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
-<div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
-Expired Hari Ini
-</div>
-
-<div id="statExpiredToday"
-class="mt-2 text-3xl font-extrabold text-red-500">
-0
-</div>
-
-</div>
-
-
-
-<div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
-<div class="text-[10px] uppercase tracking-widest font-black text-slate-400">
-Expired 7 Hari
-</div>
-
-<div id="statExpiredWeek"
-class="mt-2 text-3xl font-extrabold text-[#C6007E]">
-0
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- FILTER -->
-
-<div class="flex gap-2 overflow-x-auto pb-1">
-
-<button onclick="filterExpired('today')"
-class="px-4 py-2 rounded-2xl bg-red-500 text-white text-xs font-black whitespace-nowrap">
-Hari Ini
-</button>
-
-<button onclick="filterExpired('tomorrow')"
-class="px-4 py-2 rounded-2xl bg-orange-500 text-white text-xs font-black whitespace-nowrap">
-Besok
-</button>
-
-<button onclick="filterExpired('week')"
-class="px-4 py-2 rounded-2xl bg-[#C6007E] text-white text-xs font-black whitespace-nowrap">
-7 Hari
-</button>
-
-<button onclick="filterExpired('month')"
-class="px-4 py-2 rounded-2xl bg-slate-700 text-white text-xs font-black whitespace-nowrap">
-30 Hari
-</button>
-
-</div>
-
-
-
-<!-- LIST -->
-
-<div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
-<div id="dashboardTitle"
-class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
-Daftar Expired Hari Ini
-</div>
-
-<div id="expiredList" class="space-y-3"></div>
-
-</div>
-
-
-
-<!-- CHART -->
-
-<div class="bg-white rounded-3xl p-5 shadow-lg border border-slate-100">
-
-<div class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-4">
-Trend Expired
-</div>
-
-<canvas id="weeklyChart"></canvas>
-
-</div>
-
-</div>
-
-
-
-<!-- INPUT -->
-
-<div id="view-input" class="hidden p-5 space-y-6">
-
-<div class="bg-white p-3 rounded-2xl shadow-lg border border-slate-200">
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">
-Cari Nama / SKU Barang
-</label>
-
-<div class="relative">
-
-<input
-type="text"
-id="searchInput"
-oninput="handleSearch()"
-placeholder="Ketik minimal 2 huruf..."
-class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-[#C6007E] rounded-xl outline-none font-bold text-slate-700">
-
-<div
-id="dropdown"
-class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 hidden max-h-60 overflow-y-auto">
-</div>
-
-</div>
-
-</div>
-
-
-
-<form id="inputForm"
-class="bg-white p-6 rounded-[2rem] shadow-lg space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all">
-
-<div class="p-4 bg-pink-50 rounded-2xl border border-pink-100">
-
-<p class="text-[10px] font-black text-pink-500 uppercase tracking-widest">
-Detail Item
-</p>
-
-<div id="display-sku"
-class="font-extrabold text-[#C6007E] text-lg mt-1">
----
-</div>
-
-<div id="display-desc"
-class="text-xs text-pink-700 font-medium mt-1 italic">
-Silakan pilih dari pencarian
-</div>
-
-<input type="hidden" id="val-sku">
-<input type="hidden" id="val-desc">
-<input type="hidden" id="edit-timestamp">
-
-</div>
-
-
-
-<div class="grid grid-cols-2 gap-4">
-
-<div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-Qty
-</label>
-
-<input
-type="number"
-id="qty"
-required
-placeholder="0"
-class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold">
-
-</div>
-
-
-
-<div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-PIC
-</label>
-
-<input
-type="text"
-id="pic"
-required
-placeholder="Nama"
-class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none font-bold uppercase">
-
-</div>
-
-</div>
-
-
-
-<div>
-
-<label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-Expired Date
-</label>
-
-<input
-type="date"
-id="expiredDate"
-required
-class="w-full p-4 bg-pink-50 border-2 border-pink-100 rounded-2xl font-black text-[#C6007E] outline-none">
-
-</div>
-
-
-
-<button
-type="submit"
-id="btnSubmit"
-class="w-full py-5 bg-[#C6007E] hover:bg-[#a00067] text-white rounded-2xl font-extrabold text-lg shadow-lg">
-
-<span id="btn-text">
-SIMPAN DATA
-</span>
-
-</button>
-
-
-
-<button
-type="button"
-id="btnCancelEdit"
-onclick="cancelEdit()"
-class="hidden w-full py-3 text-xs font-bold text-slate-400 uppercase">
-
-Batal Edit
-
-</button>
-
-</form>
-
-</div>
-
-
-
-<!-- HISTORY -->
-
-<div id="view-history" class="hidden p-5 space-y-4">
-
-<div class="flex justify-between items-center px-2">
-
-<h2 class="text-sm font-black text-slate-400 uppercase tracking-widest">
-Riwayat
-</h2>
-
-<button
-onclick="loadHistory()"
-class="text-[10px] font-bold text-[#C6007E] uppercase">
-Refresh
-</button>
-
-</div>
-
-<div id="history-list" class="space-y-3"></div>
-
-</div>
-
-
-
-<!-- NOTIF -->
-
-<div id="notif"
-class="fixed bottom-6 left-6 right-6 hidden text-center p-4 rounded-2xl font-bold text-sm z-[100] shadow-2xl">
-</div>
-
-</div>
-
-
-
-<script>
-
-const API_URL = "https://script.google.com/macros/s/AKfycbx0TkK_9WokaWidnOpKj5rCWQg_FWXk5l_DrqKsceMgh_ESO56V2QIj5BM3hUlk-vMZWg/exec";
-
-let masterData = [];
-let globalHistoryData = [];
-
-window.onload = function(){
-
-fetchMaster();
-
-loadHistory();
-
-};
-
-
-
-async function fetchMaster(){
-
-const res = await fetch(API_URL + "?action=master");
-
-masterData = await res.json();
-
-}
-
-
-
-async function loadHistory(){
-
-const res = await fetch(API_URL + "?action=history");
-
-const data = await res.json();
-
-globalHistoryData = data;
-
-renderHistory(data);
-
-updateDashboard(data);
-
-}
-
-
-
-function switchView(v){
-
-document.getElementById('view-dashboard')
-.classList.toggle('hidden', v !== 'dashboard');
-
-document.getElementById('view-input')
-.classList.toggle('hidden', v !== 'input');
-
-document.getElementById('view-history')
-.classList.toggle('hidden', v !== 'history');
-
-document.getElementById('tab-dashboard').className =
-v === 'dashboard'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
-document.getElementById('tab-input').className =
-v === 'input'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
-document.getElementById('tab-history').className =
-v === 'history'
-? "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl bg-[#C6007E] text-white shadow-md"
-: "flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl text-slate-400";
-
-}
-
-
-
-function handleSearch(){
-
-const q = document.getElementById('searchInput').value.toLowerCase();
-
-const dd = document.getElementById('dropdown');
-
-if(q.length < 2){
-
-dd.classList.add('hidden');
-
-return;
-
-}
-
-const filtered = masterData.filter(i =>
-i.sku.toLowerCase().includes(q) ||
-i.desc.toLowerCase().includes(q)
-).slice(0,10);
-
-if(filtered.length > 0){
-
-dd.innerHTML = filtered.map(i => `
-
-<div
-onclick="selectItem('${i.sku}','${i.desc.replace(/'/g,"\\'")}')"
-class="p-4 border-b border-slate-50 hover:bg-pink-50 cursor-pointer">
-
-<div class="font-black text-[#C6007E] text-sm">
-${i.sku}
-</div>
-
-<div class="text-xs text-slate-500 truncate">
-${i.desc}
-</div>
-
-</div>
-
-`).join('');
-
-dd.classList.remove('hidden');
-
-}else{
-
-dd.classList.add('hidden');
-
-}
-
-}
-
-
-
-function selectItem(sku,desc){
-
-document.getElementById('display-sku').innerText = sku;
-
-document.getElementById('display-desc').innerText = desc;
-
-document.getElementById('val-sku').value = sku;
-
-document.getElementById('val-desc').value = desc;
-
-document.getElementById('dropdown').classList.add('hidden');
-
-document.getElementById('searchInput').value = '';
-
-document.getElementById('inputForm')
-.classList.remove('opacity-40','pointer-events-none');
-
-}
-
-
-
-function formatDate(dateString){
-
-const d = new Date(dateString);
-
-return d.toLocaleDateString('id-ID',{
-day:'2-digit',
-month:'2-digit',
-year:'numeric'
-});
-
-}
-
-
-
-function renderHistory(data) {
-  const list = document.getElementById('history-list');
-  
-  if (!data || data.length === 0) {
-    list.innerHTML = `
-      <div class="text-center py-10 text-slate-400 text-xs font-medium">
-        Belum ada data riwayat.
-      </div>`;
-    return;
-  }
-
-  list.innerHTML = data.map(item => `
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-2">
-      <div class="flex justify-between items-start">
-        <div>
-          <div class="text-[10px] font-black text-[#C6007E] uppercase tracking-tighter">${item.sku}</div>
-          <div class="text-sm font-bold text-slate-800 leading-tight">${item.desc}</div>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-28">
+
+    <div class="max-w-md mx-auto relative shadow-2xl min-h-screen bg-slate-50 border-x border-slate-200">
+        
+        <header class="bg-blue-600 text-white pt-10 pb-16 px-6 rounded-b-[3rem] shadow-xl text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-20 pointer-events-none"><i data-lucide="database" size="100"></i></div>
+            
+            <!-- Strategic Master Button -->
+            <button onclick="switchTab('master')" class="absolute top-8 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50">
+                <i data-lucide="database" class="w-5 h-5 text-white"></i>
+                <span class="text-[8px] font-black uppercase tracking-tighter">Master</span>
+            </button>
+
+            <h1 class="text-2xl font-extrabold tracking-tight relative z-10 uppercase">Expired Tracker</h1>
+            <p class="text-blue-100 text-[10px] font-black uppercase tracking-[0.2em] mt-1 relative z-10">Cloud Master System</p>
+        </header>
+
+        <div class="px-5 -mt-8 mb-6 relative z-20">
+            <div class="flex bg-white p-1.5 rounded-2xl shadow-lg border border-slate-200">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-active">Beranda</button>
+                <button onclick="switchTab('input')" id="btn-input" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Input</button>
+                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Laporan</button>
+            </div>
         </div>
-        <div class="text-right">
-          <div class="text-[10px] font-bold text-slate-400 uppercase">${item.pic}</div>
-          <div class="text-[10px] font-black text-slate-900">QTY: ${item.qty}</div>
-        </div>
-      </div>
-      <div class="flex justify-between items-center pt-2 border-t border-slate-50">
-        <div class="text-[10px] font-bold text-red-500 uppercase tracking-widest">
-          EXP: ${formatDate(item.expired)}
-        </div>
-        <div class="flex gap-2">
-          <button onclick='editItem(${JSON.stringify(item)})' 
-                  class="px-3 py-1 bg-slate-100 text-[9px] font-black uppercase rounded-lg text-slate-600">
-            Edit
-          </button>
-          
-          <button onclick='deleteItem(${JSON.stringify(item)})' 
-                  class="px-3 py-1 bg-red-50 text-[9px] font-black uppercase rounded-lg text-red-500">
-            Hapus
-          </button>
-        </div>
-      </div>
-    </div>`).join('');
-}
 
-
-
-function updateDashboard(data){
-
-const today = new Date();
-
-let todayCount = 0;
-let weekCount = 0;
-
-const chartMap = {};
-
-data.forEach(item => {
-
-const expDate = new Date(item.expired);
-
-const diff = Math.ceil(
-(expDate - today) / (1000*60*60*24)
-);
-
-if(diff === 0){
-todayCount++;
-}
-
-if(diff >= 0 && diff <= 7){
-weekCount++;
-}
-
-const key = expDate.toISOString().split('T')[0];
-
-if(!chartMap[key]){
-chartMap[key] = 0;
-}
-
-chartMap[key]++;
-
-});
-
-document.getElementById('statExpiredToday').innerText = todayCount;
-
-document.getElementById('statExpiredWeek').innerText = weekCount;
-
-document.getElementById('alertText').innerText =
-todayCount > 0
-? `${todayCount} item expired hari ini`
-: `Tidak ada expired hari ini`;
-
-filterExpired('today');
-
-const labels = Object.keys(chartMap).slice(-7);
-
-const values = Object.values(chartMap).slice(-7);
-
-const ctx = document.getElementById('weeklyChart').getContext('2d');
-
-if(window.myChart){
-window.myChart.destroy();
-}
-
-window.myChart = new Chart(ctx,{
-type:'bar',
-data:{
-labels:labels,
-datasets:[{
-data:values,
-borderRadius:10,
-backgroundColor:'#C6007E'
-}]
-},
-options:{
-plugins:{
-legend:{
-display:false
-}
-}
-}
-});
-
-}
-
-
-
-function filterExpired(type){
-
-const now = new Date();
-
-let filtered = [];
-
-let title = "";
-
-filtered = globalHistoryData.filter(item => {
-
-const exp = new Date(item.expired);
-
-const diff = Math.ceil(
-(exp - now) / (1000*60*60*24)
-);
-
-if(type === 'today'){
-title = "Daftar Expired Hari Ini";
-return diff === 0;
-}
-
-if(type === 'tomorrow'){
-title = "Daftar Expired Besok";
-return diff === 1;
-}
-
-if(type === 'week'){
-title = "Daftar Expired 7 Hari";
-return diff >= 0 && diff <= 7;
-}
-
-if(type === 'month'){
-title = "Daftar Expired 30 Hari";
-return diff >= 0 && diff <= 30;
-}
-
-});
-
-document.getElementById('dashboardTitle').innerText = title;
-
-const list = document.getElementById('expiredList');
-
-if(filtered.length === 0){
-
-list.innerHTML = `
-<div class="text-center py-10 text-slate-400 text-xs font-bold">
-Tidak ada data
-</div>
-`;
-
-return;
-
-}
-
-list.innerHTML = filtered.map(item => `
-
-<div class="border border-slate-100 rounded-2xl p-4 flex justify-between">
-
-<div>
-
-<div class="text-[10px] uppercase font-black tracking-widest text-[#C6007E]">
-${item.sku}
-</div>
-
-<div class="font-extrabold text-sm text-slate-800 mt-1">
-${item.desc}
-</div>
-
-<div class="text-[10px] text-red-500 font-black uppercase mt-2">
-EXP: ${formatDate(item.expired)}
-</div>
-
-</div>
-
-<div class="text-right">
-
-<div class="text-[10px] uppercase font-bold text-slate-400">
-${item.pic}
-</div>
-
-<div class="mt-1 text-sm font-black">
-QTY ${item.qty}
-</div>
-
-</div>
-
-</div>
-
-`).join('');
-
-}
-
-
-
-function editItem(item){
-
-switchView('input');
-
-document.getElementById('display-sku').innerText = item.sku;
-document.getElementById('display-desc').innerText = item.desc;
-document.getElementById('val-sku').value = item.sku;
-document.getElementById('val-desc').value = item.desc;
-document.getElementById('qty').value = item.qty;
-document.getElementById('pic').value = item.pic;
-document.getElementById('expiredDate').value = item.expired.split('T')[0];
-document.getElementById('edit-timestamp').value = item.timestamp;
-
-document.getElementById('btn-text').innerText = "UPDATE DATA";
-
-document.getElementById('btnCancelEdit')
-.classList.remove('hidden');
-
-document.getElementById('inputForm')
-.classList.remove('opacity-40','pointer-events-none');
-
-}
-
-
-
-function cancelEdit(){
-
-document.getElementById('inputForm').reset();
-
-document.getElementById('edit-timestamp').value = "";
-
-document.getElementById('btn-text').innerText = "SIMPAN DATA";
-
-document.getElementById('btnCancelEdit')
-.classList.add('hidden');
-
-document.getElementById('inputForm')
-.classList.add('opacity-40','pointer-events-none');
-
-document.getElementById('display-sku').innerText = "---";
-
-document.getElementById('display-desc').innerText =
-"Silakan pilih dari pencarian";
-
-}
-
-
-
-async function deleteItem(item) { // Terima objek 'item' lengkap, bukan cuma timestamp
-  if (!confirm("Hapus data ini?")) return;
-  
-  if (typeof showNotif === "function") showNotif("Menghapus...", "blue");
-
-  try {
-    await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "delete",
-        timestamp: item.timestamp,
-        sku: item.sku,
-        qty: item.qty
-      })
-    });
-    loadHistory();
-  } catch (e) {
-    alert("Gagal: " + e.message);
-  }
-}
-
-
-
-document.getElementById('inputForm').onsubmit =
-async function(e){
-
-e.preventDefault();
-
-const timestamp =
-document.getElementById('edit-timestamp').value;
-
-const data = {
-
-action: timestamp ? "edit" : "save",
-
-timestamp: timestamp,
-
-sku: document.getElementById('val-sku').value,
-
-desc: document.getElementById('val-desc').value,
-
-qty: document.getElementById('qty').value,
-
-pic: document.getElementById('pic').value,
-
-expired: document.getElementById('expiredDate').value
-
-};
-
-await fetch(API_URL,{
-method:"POST",
-body:JSON.stringify(data)
-});
-
-cancelEdit();
-
-loadHistory();
-
-};
-
-</script>
-
+        <main id="app-content">
+            
+            <section id="view-dashboard" class="px-5 space-y-4 animate-in fade-in duration-500">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 flex justify-between items-center">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Monitored</p>
+                            <div id="stat-total" class="text-3xl font-black text-slate-800">0</div>
+                        </div>
+                        <div class="p-4 bg-blue-50 text-blue-600 rounded-3xl"><i data-lucide="package" class="w-7 h-7"></i></div>
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-[2rem] border border-red-100 shadow-sm">
+                        <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-1">H-7 Alert</p>
+                        <div id="stat-h7" class="text-3xl font-black text-red-600">0</div>
+                    </div>
+                    <div class="bg-yellow-50 p-5 rounded-[2rem] border border-yellow-100 shadow-sm">
+                        <p class="text-[9px] font-black text-yellow-600 uppercase tracking-widest mb-1">H-30 Alert</p>
+                        <div id="stat-h30" class="text-3xl font-black text-yellow-700">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-input" class="hide px-5 space-y-6">
+                <div class="bg-white p-4 rounded-3xl shadow-lg border border-slate-200">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">Cari Nama / SKU</label>
+                    <div class="relative">
+                        <input type="text" id="master-search-input" oninput="handleMasterSearch(this.value)" placeholder="Ketik minimal 2 huruf..." class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none font-bold text-slate-700 pl-12">
+                        <i data-lucide="search" class="absolute left-4 top-4 text-slate-400 w-5 h-5"></i>
+                        <div id="search-dropdown" class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto hide"></div>
+                    </div>
+                </div>
+
+                <form id="expiry-form" class="bg-white p-7 rounded-[2.5rem] shadow-xl space-y-5 border border-slate-200 opacity-40 pointer-events-none transition-all">
+                    <input type="hidden" id="form-id">
+                    <input type="hidden" id="form-sku">
+                    <input type="hidden" id="form-desc">
+                    
+                    <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-3">
+                        <div class="p-2 bg-white rounded-lg shadow-sm text-blue-600"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+                        <div class="flex-1">
+                            <div id="display-sku" class="font-extrabold text-blue-900 text-lg leading-tight">---</div>
+                            <div id="display-desc" class="text-xs text-blue-600 font-bold mt-1 italic leading-tight truncate w-48">Pilih produk dari pencarian</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Qty</label>
+                            <input type="number" id="form-qty" required class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PIC</label>
+                            <input type="text" id="form-pic" required class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold uppercase">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tanggal Expired</label>
+                        <input type="date" id="form-date" required class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900">
+                    </div>
+
+                    <button type="submit" id="btn-save" class="w-full py-5 bg-blue-600 text-white rounded-3xl font-extrabold text-lg shadow-lg active:scale-95 transition-all">SIMPAN DATA</button>
+                    <button type="button" onclick="resetForm()" id="btn-cancel" class="hide w-full text-center text-[10px] font-black text-slate-400 uppercase">Batal Edit</button>
+                </form>
+            </section>
+
+            <section id="view-history" class="hide px-5 space-y-4">
+                <div class="flex justify-between items-center px-2">
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Daftar Inventory</div>
+                    <i data-lucide="filter" class="w-4 h-4 text-slate-300"></i>
+                </div>
+                <div id="inventory-list" class="space-y-4"></div>
+            </section>
+
+            <section id="view-master" class="hide px-5 space-y-4">
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between gap-3">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase">Import CSV</span>
+                        <span class="text-[9px] text-blue-500 font-bold">sku, description</span>
+                    </div>
+                    <div class="flex gap-2 flex-1 justify-end">
+                        <input type="file" id="csv-input" accept=".csv" class="hide" onchange="handleCSV(event)">
+                        <button onclick="document.getElementById('csv-input').click()" id="btn-csv" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-black text-[10px] flex items-center gap-2 shadow-lg active:scale-95 transition-all">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i> PILIH FILE
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <input type="text" oninput="renderMasterList(this.value)" placeholder="Cari SKU di master..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold pl-12 shadow-sm outline-none focus:border-blue-500 transition-all">
+                    <i data-lucide="search" class="absolute left-4 top-4 text-slate-300 w-4 h-4"></i>
+                </div>
+
+                <div class="flex justify-between items-center px-2">
+                    <div id="master-count" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">0 SKU Terdaftar</div>
+                    <button onclick="switchTab('dashboard')" class="text-[10px] font-black text-blue-600">KEMBALI</button>
+                </div>
+                <div id="master-list" class="space-y-2"></div>
+            </section>
+
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-8 py-5 flex justify-around items-center z-[100] max-w-md mx-auto rounded-t-[2.5rem] shadow-2xl">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="p-2 text-blue-600 scale-110"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></button>
+            <button onclick="switchTab('input')" id="nav-input" class="p-3 text-slate-300 transition-all"><i data-lucide="plus" class="w-6 h-6"></i></button>
+            <button onclick="switchTab('history')" id="nav-history" class="p-2 text-slate-300 transition-all"><i data-lucide="history" class="w-6 h-6"></i></button>
+        </nav>
+
+        <div id="notif-box" class="hide fixed bottom-24 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[100] text-white font-bold text-xs text-center animate-in slide-in-from-bottom-10"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAf24482S97N82pkopYpj1ZJqdOPiwW9g4",
+            authDomain: "expired-tracker-pro.firebaseapp.com",
+            projectId: "expired-tracker-pro",
+            storageBucket: "expired-tracker-pro.firebasestorage.app",
+            messagingSenderId: "610264736832",
+            appId: "1:610264736832:web:0838a2477519f4dd952ba5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let masterProducts = [];
+        let inventoryData = [];
+
+        const showNotif = (msg, type = 'blue') => {
+            const box = document.getElementById('notif-box');
+            const colors = { emerald: 'bg-emerald-500', red: 'bg-red-500', blue: 'bg-blue-600' };
+            box.className = `${colors[type]} fixed bottom-24 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[100] text-white font-bold text-xs text-center`;
+            box.innerText = msg;
+            box.classList.remove('hide');
+            setTimeout(() => box.classList.add('hide'), 3000);
+        };
+
+        onSnapshot(query(collection(db, "master_products"), orderBy("sku")), (snap) => {
+            masterProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            document.getElementById('master-count').innerText = `${masterProducts.length} SKU Terdaftar`;
+            renderMasterList();
+        });
+
+        onSnapshot(query(collection(db, "inventory_expired"), orderBy("createdAt", "desc")), (snap) => {
+            inventoryData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            updateStats();
+            renderInventoryList();
+        });
+
+        window.switchTab = (tab) => {
+            const views = ['dashboard', 'input', 'history', 'master'];
+            views.forEach(v => document.getElementById(`view-${v}`).classList.add('hide'));
+            document.getElementById(`view-${tab}`).classList.remove('hide');
+            
+            const navs = ['dashboard', 'input', 'history'];
+            navs.forEach(n => {
+                const btn = document.getElementById(`nav-${n}`);
+                const tabBtn = document.getElementById(`btn-${n}`);
+                if (btn) btn.className = n === tab ? 'p-2 text-blue-600 scale-110' : 'p-2 text-slate-300';
+                if (tabBtn) tabBtn.className = n === tab ? 'flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl tab-active' : 'flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl tab-inactive';
+            });
+            lucide.createIcons();
+        };
+
+        window.handleMasterSearch = (val) => {
+            const dropdown = document.getElementById('search-dropdown');
+            if (val.length < 2) { dropdown.classList.add('hide'); return; }
+            const filtered = masterProducts.filter(p => 
+                p.sku?.toLowerCase().includes(val.toLowerCase()) || 
+                p.itemDescription?.toLowerCase().includes(val.toLowerCase())
+            ).slice(0, 10);
+            dropdown.innerHTML = filtered.map(p => `
+                <div onclick="selectProduct('${p.sku}', '${p.itemDescription.replace(/'/g, "\\'")}')" class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col">
+                    <span class="font-black text-blue-700 text-sm">${p.sku}</span>
+                    <span class="text-xs text-slate-500 font-bold truncate">${p.itemDescription}</span>
+                </div>
+            `).join('');
+            dropdown.classList.remove('hide');
+        };
+
+        window.selectProduct = (sku, desc) => {
+            document.getElementById('form-sku').value = sku;
+            document.getElementById('form-desc').value = desc;
+            document.getElementById('display-sku').innerText = sku;
+            document.getElementById('display-desc').innerText = desc;
+            document.getElementById('search-dropdown').classList.add('hide');
+            document.getElementById('master-search-input').value = '';
+            document.getElementById('expiry-form').classList.remove('opacity-40', 'pointer-events-none');
+        };
+
+        document.getElementById('expiry-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save');
+            const id = document.getElementById('form-id').value;
+            btn.innerText = "MEMPROSES...";
+            const payload = {
+                sku: document.getElementById('form-sku').value,
+                itemDescription: document.getElementById('form-desc').value,
+                qty: parseInt(document.getElementById('form-qty').value),
+                pic: document.getElementById('form-pic').value.toUpperCase(),
+                expiredDate: document.getElementById('form-date').value,
+                updatedAt: serverTimestamp()
+            };
+            try {
+                if (id) {
+                    await updateDoc(doc(db, "inventory_expired", id), payload);
+                    showNotif("Data diperbarui!", "emerald");
+                } else {
+                    await addDoc(collection(db, "inventory_expired"), {
+                        ...payload,
+                        createdAt: serverTimestamp(),
+                        notificationFlags: {}
+                    });
+                    showNotif("Berhasil disimpan!", "blue");
+                }
+                resetForm();
+                switchTab('history');
+            } catch (err) { showNotif("Gagal simpan", "red"); } finally { btn.innerText = "SIMPAN DATA"; }
+        };
+
+        window.resetForm = () => {
+            document.getElementById('expiry-form').reset();
+            document.getElementById('form-id').value = '';
+            document.getElementById('display-sku').innerText = '---';
+            document.getElementById('display-desc').innerText = 'Pilih produk dari pencarian';
+            document.getElementById('expiry-form').classList.add('opacity-40', 'pointer-events-none');
+            document.getElementById('btn-cancel').classList.add('hide');
+            document.getElementById('btn-save').innerText = 'SIMPAN DATA';
+        };
+
+        const updateStats = () => {
+            const today = new Date().setHours(0,0,0,0);
+            const stats = { total: inventoryData.length, h7: 0, h30: 0 };
+            inventoryData.forEach(item => {
+                const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                if (diff > 0 && diff <= 7) stats.h7++;
+                if (diff > 7 && diff <= 30) stats.h30++;
+            });
+            document.getElementById('stat-total').innerText = stats.total;
+            document.getElementById('stat-h7').innerText = stats.h7;
+            document.getElementById('stat-h30').innerText = stats.h30;
+        };
+
+        window.renderInventoryList = () => {
+            const list = document.getElementById('inventory-list');
+            const today = new Date().setHours(0,0,0,0);
+            list.innerHTML = inventoryData.map(item => {
+                const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                const color = diff <= 0 ? 'bg-black' : diff <= 7 ? 'bg-red-500' : diff <= 30 ? 'bg-yellow-500' : 'bg-blue-500';
+                return `
+                    <div class="bg-white p-5 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col gap-3 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-2 h-full ${color}"></div>
+                        <div class="flex justify-between items-start pl-3">
+                            <div class="flex-1 overflow-hidden">
+                                <div class="text-[10px] font-black text-blue-600 uppercase">${item.sku}</div>
+                                <div class="text-sm font-black text-slate-800 truncate">${item.itemDescription}</div>
+                            </div>
+                            <div class="bg-slate-100 px-3 py-1 rounded-full font-black text-[10px] ml-2">QTY: ${item.qty}</div>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-slate-50 pl-3">
+                            <div>
+                                <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> ${item.expiredDate}
+                                </div>
+                                <div class="text-[9px] font-bold text-slate-300 uppercase mt-1">PIC: ${item.pic}</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editEntry('${item.id}')" class="p-2 text-slate-300 hover:text-blue-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="deleteEntry('${item.id}')" class="p-2 text-slate-200 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        };
+
+        window.editEntry = (id) => {
+            const item = inventoryData.find(i => i.id === id);
+            if (!item) return;
+            switchTab('input');
+            document.getElementById('form-id').value = item.id;
+            document.getElementById('form-sku').value = item.sku;
+            document.getElementById('form-desc').value = item.itemDescription;
+            document.getElementById('form-qty').value = item.qty;
+            document.getElementById('form-pic').value = item.pic;
+            document.getElementById('form-date').value = item.expiredDate;
+            document.getElementById('display-sku').innerText = item.sku;
+            document.getElementById('display-desc').innerText = item.itemDescription;
+            document.getElementById('expiry-form').classList.remove('opacity-40', 'pointer-events-none');
+            document.getElementById('btn-cancel').classList.remove('hide');
+            document.getElementById('btn-save').innerText = 'UPDATE DATA';
+        };
+
+        window.deleteEntry = async (id) => {
+            try {
+                await deleteDoc(doc(db, "inventory_expired", id));
+                showNotif("Data dihapus", "red");
+            } catch (e) { showNotif("Gagal hapus", "red"); }
+        };
+
+        window.renderMasterList = (search = '') => {
+            const list = document.getElementById('master-list');
+            const filtered = search ? masterProducts.filter(p => p.sku.toLowerCase().includes(search.toLowerCase()) || p.itemDescription.toLowerCase().includes(search.toLowerCase())) : masterProducts.slice(0, 50);
+            list.innerHTML = filtered.map((p, idx) => `
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-[10px] font-black text-slate-300">${idx+1}</div>
+                        <div>
+                            <div class="text-[10px] font-black text-blue-600 uppercase leading-none mb-0.5">${p.sku}</div>
+                            <div class="text-xs font-bold text-slate-800 truncate w-40">${p.itemDescription}</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteMaster('${p.id}')" class="p-2 text-slate-200 hover:text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        };
+
+        window.deleteMaster = async (id) => {
+            try {
+                await deleteDoc(doc(db, "master_products", id));
+                showNotif("SKU dihapus", "red");
+            } catch (e) { showNotif("Gagal", "red"); }
+        };
+
+        window.handleCSV = (e) => {
+            const file = e.target.files[0];
+            const btn = document.getElementById('btn-csv');
+            if (!file) return;
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async (results) => {
+                    const data = results.data;
+                    btn.disabled = true;
+                    btn.innerText = "IMPORTING...";
+                    try {
+                        const chunks = [];
+                        for (let i = 0; i < data.length; i += 400) { chunks.push(data.slice(i, i + 400)); }
+                        for (const chunk of chunks) {
+                            const batch = writeBatch(db);
+                            chunk.forEach(row => {
+                                const skuKey = Object.keys(row).find(k => k.toLowerCase().includes('sku'));
+                                const descKey = Object.keys(row).find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('item'));
+                                if (row[skuKey] && row[descKey]) {
+                                    const newDoc = doc(collection(db, "master_products"));
+                                    batch.set(newDoc, {
+                                        sku: row[skuKey].toString().toUpperCase(),
+                                        itemDescription: row[descKey],
+                                        createdAt: serverTimestamp()
+                                    });
+                                }
+                            });
+                            await batch.commit();
+                        }
+                        showNotif(`Berhasil import ${data.length} data`, "emerald");
+                    } catch (err) { showNotif("Gagal import", "red"); } finally {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i data-lucide="upload" class="w-3.5 h-3.5"></i> PILIH FILE';
+                        lucide.createIcons();
+                        e.target.value = '';
+                    }
+                }
+            });
+        };
+
+        lucide.createIcons();
+    </script>
 </body>
 </html>
