@@ -3,7 +3,7 @@ const axios = require('axios');
 
 async function run() {
     try {
-        console.log("--- Memulai Robot Notifikasi (Versi Sate Kulit) ---");
+        console.log("--- Memulai Robot Notifikasi (Perbaikan SKU) ---");
         
         if (!process.env.FIREBASE_SERVICE_ACCOUNT) throw new Error("Secret FIREBASE_SERVICE_ACCOUNT tidak ditemukan!");
 
@@ -28,10 +28,16 @@ async function run() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            // SESUAI GAMBAR: mengambil expiredDate dan itemDescription
+            
+            // Ambil data sesuai struktur di gambar image_856b1d.png
             const exp = data.expiredDate; 
             const nama = data.itemDescription;
-            const sku = data.notificationFlags ? data.notificationFlags.sku : "N/A";
+            
+            // PERBAIKAN SKU: Mengambil dari dalam notificationFlags
+            let sku = "N/A";
+            if (data.notificationFlags && data.notificationFlags.sku) {
+                sku = data.notificationFlags.sku;
+            }
 
             if (exp && nama) {
                 report += `- *${nama}*\n  SKU: ${sku}\n  Exp: ${exp}\n\n`;
@@ -48,8 +54,6 @@ async function run() {
                 headers: { 'Authorization': process.env.FONNTE_TOKEN }
             });
             console.log("Pesan WA Berhasil Terkirim!");
-        } else {
-            console.log("Data ditemukan tapi format field salah.");
         }
 
     } catch (err) {
