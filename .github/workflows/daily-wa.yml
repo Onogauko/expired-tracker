@@ -1,16 +1,30 @@
-<!-- STREAMING_CHUNK:Setting up environment... -->
-  - name: Setup Node.js
-    uses: actions/setup-node@v3
-    with:
-      node-version: '16'
-      
-  - name: Install dependencies
-    run: npm install axios firebase-admin
-    
-  <!-- STREAMING_CHUNK:Executing the notification robot... -->
-  - name: Run Notifier
-    env:
-      FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
-      WA_TARGET: ${{ secrets.WA_TARGET }}
-      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-    run: node notify.js
+name: Daily WhatsApp Expiry Notification
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *' # Jam 8 Pagi WIB (01:00 UTC)
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: |
+          npm init -y
+          npm install firebase-admin axios
+
+      - name: Run Notifier
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
+          WA_TARGET: ${{ secrets.WA_TARGET }}
+        run: node notify.js
