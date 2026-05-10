@@ -37,10 +37,19 @@ async function run() {
                 const thn = expDate.getFullYear();
                 const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
 
-                // PERBAIKAN KRUSIAL: Memastikan akses ke notificationFlags
-                const flags = data.notificationFlags || {};
-                const skuValue = flags.sku || "N/A";
-                const qtyValue = flags.qty || 0;
+                // PERBAIKAN FINAL: Mengambil data dari Array notificationFlags
+                let skuValue = "N/A";
+                let qtyValue = 0;
+
+                if (Array.isArray(data.notificationFlags) && data.notificationFlags.length > 0) {
+                    // Mengambil data dari elemen pertama di dalam array
+                    skuValue = data.notificationFlags[0].sku || "N/A";
+                    qtyValue = data.notificationFlags[0].qty || 0;
+                } else if (data.notificationFlags && typeof data.notificationFlags === 'object') {
+                    // Jaga-jaga jika ternyata bukan array tapi object biasa
+                    skuValue = data.notificationFlags.sku || "N/A";
+                    qtyValue = data.notificationFlags.qty || 0;
+                }
 
                 if (diffDays >= 0) {
                     items.push({
@@ -72,7 +81,7 @@ async function run() {
             }, {
                 headers: { 'Authorization': process.env.FONNTE_TOKEN }
             });
-            console.log("Laporan terkirim dengan SKU dan Qty yang sudah diperbaiki.");
+            console.log("Laporan terkirim dengan perbaikan Array mapping.");
         }
 
     } catch (err) {
