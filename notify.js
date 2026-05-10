@@ -41,9 +41,18 @@ async function run() {
 
             const data = doc.data();
 
-            // Debug optional
-            // console.log(JSON.stringify(data, null, 2));
+            // ================= DEBUG =================
+            console.log("FULL DATA:", JSON.stringify(data));
+            console.log("notificationFlags:", data.notificationFlags);
 
+            if (data.notificationFlags) {
+                console.log("SKU:", data.notificationFlags.sku);
+                console.log("QTY:", data.notificationFlags.qty);
+            }
+
+            console.log("==========================");
+
+            // ================= VALIDASI =================
             if (data.expiredDate && data.itemDescription) {
 
                 const expDate = new Date(data.expiredDate);
@@ -57,13 +66,16 @@ async function run() {
 
                 const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
 
-                // ================= FIX SKU & QTY =================
-                // notificationFlags berbentuk OBJECT bukan ARRAY
+                // ================= AMBIL SKU & QTY =================
+                let skuValue = "N/A";
+                let qtyValue = 0;
 
-                let skuValue = data.notificationFlags?.sku || "N/A";
-                let qtyValue = data.notificationFlags?.qty || 0;
+                if (data.notificationFlags) {
+                    skuValue = data.notificationFlags.sku || "N/A";
+                    qtyValue = data.notificationFlags.qty || 0;
+                }
 
-                // Hanya tampilkan barang yang belum expired
+                // ================= FILTER BELUM EXPIRED =================
                 if (diffDays >= 0) {
 
                     items.push({
@@ -111,13 +123,16 @@ async function run() {
             );
 
             console.log("Laporan WA berhasil terkirim.");
+
         } else {
+
             console.log("Tidak ada barang mendekati expired.");
+
         }
 
     } catch (err) {
 
-        console.error("DETEKSI ERROR:", err.message);
+        console.error("DETEKSI ERROR:", err);
         process.exit(1);
 
     }
