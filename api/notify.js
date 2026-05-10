@@ -40,6 +40,7 @@ module.exports = async (req, res) => {
             const data = doc.data();
 
             console.log("FULL DATA:", JSON.stringify(data));
+            console.log("notificationFlags RAW:", JSON.stringify(data.notificationFlags));
 
             if (data.expiredDate && data.itemDescription) {
 
@@ -57,13 +58,57 @@ module.exports = async (req, res) => {
                 let skuValue = "N/A";
                 let qtyValue = 0;
 
-                if (data.notificationFlags) {
-                    skuValue = data.notificationFlags.sku || "N/A";
-                    qtyValue = data.notificationFlags.qty || 0;
+                // =========================
+                // DETEKSI SEMUA KEMUNGKINAN
+                // =========================
+
+                // Jika field langsung di document
+                if (data.sku) {
+                    skuValue = data.sku;
                 }
 
-                console.log("SKU:", skuValue);
-                console.log("QTY:", qtyValue);
+                if (data.qty) {
+                    qtyValue = data.qty;
+                }
+
+                // Jika di notificationFlags object
+                if (data.notificationFlags && typeof data.notificationFlags === 'object') {
+
+                    skuValue =
+                        data.notificationFlags.sku ||
+                        data.notificationFlags.SKU ||
+                        skuValue;
+
+                    qtyValue =
+                        data.notificationFlags.qty ||
+                        data.notificationFlags.QTY ||
+                        qtyValue;
+                }
+
+                // Jika notificationFlags string JSON
+                if (data.notificationFlags && typeof data.notificationFlags === 'string') {
+
+                    try {
+
+                        const parsed = JSON.parse(data.notificationFlags);
+
+                        skuValue =
+                            parsed.sku ||
+                            parsed.SKU ||
+                            skuValue;
+
+                        qtyValue =
+                            parsed.qty ||
+                            parsed.QTY ||
+                            qtyValue;
+
+                    } catch (e) {
+                        console.log("notificationFlags bukan JSON valid");
+                    }
+                }
+
+                console.log("FINAL SKU:", skuValue);
+                console.log("FINAL QTY:", qtyValue);
 
                 if (diffDays >= 0) {
 
@@ -84,14 +129,15 @@ module.exports = async (req, res) => {
         if (items.length > 0) {
 
             let report = `⚠️ *LAPORAN EXPIRED*\n`;
-            report += `Halo Team, ada ${items.length} barang perlu dicek.\n\n`;
+            report += `Halo Team, ada ${items.length} barang perlu dicek.\n`;
+            report += `(Diurutkan dari expired terdekat)\n\n`;
 
             items.forEach((item, index) => {
 
                 report += `${index + 1}. *${item.nama.toUpperCase()}*\n`;
-                report += `🔖 SKU: ${item.sku}\n`;
-                report += `📦 Qty: ${item.qty}\n`;
-                report += `⏳ Exp: ${item.expFormatted} (${item.daysLeft} hari lagi)\n\n`;
+                report += `    🔖 SKU: ${item.sku}\n`;
+                report += `    📦 Qty: ${item.qty}\n`;
+                report += `    ⏳ Exp: ${item.expFormatted} (${item.daysLeft} hari lagi)\n\n`;
 
             });
 
@@ -114,7 +160,7 @@ module.exports = async (req, res) => {
 
     } catch (err) {
 
-        console.error(err);
+        console.error("ERROR:", err);
 
         return res.status(500).send(err.message);
 
