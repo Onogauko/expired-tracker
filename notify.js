@@ -37,16 +37,12 @@ async function run() {
                 const thn = expDate.getFullYear();
                 const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
 
-                // PERBAIKAN FINAL: Mengambil data dari Array notificationFlags
+                // PERBAIKAN TOTAL: Mengikuti titik koordinat di image_856b1d.png
                 let skuValue = "N/A";
                 let qtyValue = 0;
 
-                if (Array.isArray(data.notificationFlags) && data.notificationFlags.length > 0) {
-                    // Mengambil data dari elemen pertama di dalam array
-                    skuValue = data.notificationFlags[0].sku || "N/A";
-                    qtyValue = data.notificationFlags[0].qty || 0;
-                } else if (data.notificationFlags && typeof data.notificationFlags === 'object') {
-                    // Jaga-jaga jika ternyata bukan array tapi object biasa
+                if (data.notificationFlags) {
+                    // Berdasarkan gambar, sku dan qty ada langsung di bawah notificationFlags
                     skuValue = data.notificationFlags.sku || "N/A";
                     qtyValue = data.notificationFlags.qty || 0;
                 }
@@ -81,7 +77,7 @@ async function run() {
             }, {
                 headers: { 'Authorization': process.env.FONNTE_TOKEN }
             });
-            console.log("Laporan terkirim dengan perbaikan Array mapping.");
+            console.log("Laporan terkirim dengan mapping data yang diperbaiki.");
         }
 
     } catch (err) {
