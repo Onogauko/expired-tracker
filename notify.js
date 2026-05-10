@@ -32,18 +32,21 @@ async function run() {
                 const diffTime = expDate - now;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 
-                // Format tanggal ke "DD Mei 2026"
                 const tgl = expDate.getDate();
                 const bln = bulanIndo[expDate.getMonth()];
                 const thn = expDate.getFullYear();
                 const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
 
+                // PERBAIKAN KRUSIAL: Memastikan akses ke notificationFlags
+                const flags = data.notificationFlags || {};
+                const skuValue = flags.sku || "N/A";
+                const qtyValue = flags.qty || 0;
+
                 if (diffDays >= 0) {
                     items.push({
                         nama: data.itemDescription,
-                        // Ambil SKU dan Qty dari dalam notificationFlags
-                        sku: data.notificationFlags ? data.notificationFlags.sku : "N/A",
-                        qty: data.notificationFlags ? data.notificationFlags.qty : 0,
+                        sku: skuValue,
+                        qty: qtyValue,
                         expFormatted: formatTanggalIndo,
                         daysLeft: diffDays
                     });
@@ -69,7 +72,7 @@ async function run() {
             }, {
                 headers: { 'Authorization': process.env.FONNTE_TOKEN }
             });
-            console.log("Laporan berhasil dikirim dengan format baru!");
+            console.log("Laporan terkirim dengan SKU dan Qty yang sudah diperbaiki.");
         }
 
     } catch (err) {
