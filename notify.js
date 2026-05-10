@@ -3,20 +3,32 @@ const axios = require('axios');
 
 async function run() {
     try {
-        if (!process.env.FIREBASE_SERVICE_ACCOUNT) throw new Error("Secret FIREBASE_SERVICE_ACCOUNT tidak ditemukan!");
+
+        // ================= FIREBASE =================
+        if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+            throw new Error("Secret FIREBASE_SERVICE_ACCOUNT tidak ditemukan!");
+        }
 
         const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-        
+
         if (!admin.apps.length) {
-            admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
         }
 
         const db = admin.firestore();
+
+        // ================= AMBIL DATA =================
         const snapshot = await db.collection('inventory_expired').get();
-        
-        if (snapshot.empty) return;
+
+        if (snapshot.empty) {
+            console.log("Tidak ada data.");
+            return;
+        }
 
         let items = [];
+
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
@@ -26,28 +38,34 @@ async function run() {
         ];
 
         snapshot.forEach(doc => {
+
             const data = doc.data();
+
+            // Debug optional
+            // console.log(JSON.stringify(data, null, 2));
+
             if (data.expiredDate && data.itemDescription) {
+
                 const expDate = new Date(data.expiredDate);
+
                 const diffTime = expDate - now;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 const tgl = expDate.getDate();
                 const bln = bulanIndo[expDate.getMonth()];
                 const thn = expDate.getFullYear();
+
                 const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
 
-                // PERBAIKAN TOTAL: Mengikuti titik koordinat di image_856b1d.png
-                let skuValue = "N/A";
-                let qtyValue = 0;
+                // ================= FIX SKU & QTY =================
+                // notificationFlags berbentuk OBJECT bukan ARRAY
 
-                if (data.notificationFlags) {
-                    // Berdasarkan gambar, sku dan qty ada langsung di bawah notificationFlags
-                    skuValue = data.notificationFlags.sku || "N/A";
-                    qtyValue = data.notificationFlags.qty || 0;
-                }
+                let skuValue = data.notificationFlags?.sku || "N/A";
+                let qtyValue = data.notificationFlags?.qty || 0;
 
+                // Hanya tampilkan barang yang belum expired
                 if (diffDays >= 0) {
+
                     items.push({
                         nama: data.itemDescription,
                         sku: skuValue,
@@ -55,34 +73,53 @@ async function run() {
                         expFormatted: formatTanggalIndo,
                         daysLeft: diffDays
                     });
+
                 }
             }
         });
 
+        // ================= SORTING =================
         items.sort((a, b) => a.daysLeft - b.daysLeft);
 
+        // ================= KIRIM WA =================
         if (items.length > 0) {
-            let report = `⚠️ *LAPORAN EXPIRED*\nHalo Team, ada ${items.length} barang perlu dicek (Diurutkan dari yang terdekat):\n\n`;
-            
+
+            let report = `⚠️ *LAPORAN EXPIRED*\n`;
+            report += `Halo Team, ada ${items.length} barang perlu dicek.\n`;
+            report += `(Diurutkan dari expired terdekat)\n\n`;
+
             items.forEach((item, index) => {
+
                 report += `${index + 1}. *${item.nama.toUpperCase()}*\n`;
                 report += `    🔖 SKU: ${item.sku}\n`;
                 report += `    📦 Qty: ${item.qty}\n`;
                 report += `    ⏳ Exp: ${item.expFormatted} (${item.daysLeft} hari lagi)\n\n`;
+
             });
 
-            await axios.post('https://api.fonnte.com/send', {
-                target: process.env.WA_TARGET,
-                message: report.trim()
-            }, {
-                headers: { 'Authorization': process.env.FONNTE_TOKEN }
-            });
-            console.log("Laporan terkirim dengan mapping data yang diperbaiki.");
+            await axios.post(
+                'https://api.fonnte.com/send',
+                {
+                    target: process.env.WA_TARGET,
+                    message: report.trim()
+                },
+                {
+                    headers: {
+                        Authorization: process.env.FONNTE_TOKEN
+                    }
+                }
+            );
+
+            console.log("Laporan WA berhasil terkirim.");
+        } else {
+            console.log("Tidak ada barang mendekati expired.");
         }
 
     } catch (err) {
+
         console.error("DETEKSI ERROR:", err.message);
         process.exit(1);
+
     }
 }
 
