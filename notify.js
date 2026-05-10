@@ -20,6 +20,11 @@ async function run() {
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
+        const bulanIndo = [
+            "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+            "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+        ];
+
         snapshot.forEach(doc => {
             const data = doc.data();
             if (data.expiredDate && data.itemDescription) {
@@ -27,32 +32,35 @@ async function run() {
                 const diffTime = expDate - now;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 
-                // Hanya ambil yang belum lewat atau segera expired (misal H-120 ke bawah)
+                // Format tanggal ke "DD Mei 2026"
+                const tgl = expDate.getDate();
+                const bln = bulanIndo[expDate.getMonth()];
+                const thn = expDate.getFullYear();
+                const formatTanggalIndo = `${tgl} ${bln} ${thn}`;
+
                 if (diffDays >= 0) {
                     items.push({
                         nama: data.itemDescription,
+                        // Ambil SKU dan Qty dari dalam notificationFlags
                         sku: data.notificationFlags ? data.notificationFlags.sku : "N/A",
                         qty: data.notificationFlags ? data.notificationFlags.qty : 0,
-                        exp: data.expiredDate,
-                        daysLeft: diffDays,
-                        rawDate: expDate
+                        expFormatted: formatTanggalIndo,
+                        daysLeft: diffDays
                     });
                 }
             }
         });
 
-        // Urutkan dari yang terdekat (paling kecil sisa harinya)
         items.sort((a, b) => a.daysLeft - b.daysLeft);
 
         if (items.length > 0) {
             let report = `⚠️ *LAPORAN EXPIRED*\nHalo Team, ada ${items.length} barang perlu dicek (Diurutkan dari yang terdekat):\n\n`;
             
             items.forEach((item, index) => {
-                // Format tanggal ke gaya Indonesia (opsional, saat ini mengikuti database)
                 report += `${index + 1}. *${item.nama.toUpperCase()}*\n`;
                 report += `    🔖 SKU: ${item.sku}\n`;
                 report += `    📦 Qty: ${item.qty}\n`;
-                report += `    ⏳ Exp: ${item.exp} (${item.daysLeft} hari lagi)\n\n`;
+                report += `    ⏳ Exp: ${item.expFormatted} (${item.daysLeft} hari lagi)\n\n`;
             });
 
             await axios.post('https://api.fonnte.com/send', {
@@ -61,7 +69,7 @@ async function run() {
             }, {
                 headers: { 'Authorization': process.env.FONNTE_TOKEN }
             });
-            console.log("Laporan rapi berhasil dikirim!");
+            console.log("Laporan berhasil dikirim dengan format baru!");
         }
 
     } catch (err) {
