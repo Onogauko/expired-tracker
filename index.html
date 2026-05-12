@@ -112,7 +112,7 @@
             <div class="flex bg-white p-1.5 rounded-2xl shadow-lg border border-slate-100">
                 <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-active">Beranda</button>
                 <button onclick="switchTab('input')" id="btn-input" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Input</button>
-                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Laporan</button>
+                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Riwayat</button>
             </div>
         </div>
 
@@ -218,7 +218,7 @@
             <!-- History View -->
             <section id="view-history" class="hide px-6 space-y-4 animate-in slide-in-from-right-4">
                 <div class="flex justify-between items-center px-2">
-                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Daftar Inventory</div>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Riwayat Inventory</div>
                     <i data-lucide="filter" class="w-4 h-4 text-slate-300"></i>
                 </div>
                 <div class="relative">
@@ -521,7 +521,7 @@
                 let colorClass = 'bg-blue-500';
                 let tagClass = 'bg-blue-50 text-blue-600';
                 if (diff <= 0) { colorClass = 'bg-slate-900'; tagClass='bg-slate-100 text-slate-800'; }
-                else if (diff <= 7) { colorClass = 'bg-red-500'; tagClass='bg-red-50 text-red-600'; }
+                else if (diff <= 7) { colorClass = 'bg-red-500'; tagClass='bg-red-600 text-white shadow-sm'; }
                 else if (diff <= 30) { colorClass = 'bg-orange-500'; tagClass='bg-orange-50 text-orange-600'; }
                 return `
                     <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col gap-4 relative overflow-hidden group">
