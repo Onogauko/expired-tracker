@@ -69,10 +69,20 @@
                     </div>
                 </div>
                 
-                <button onclick="switchTab('master')" class="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50">
-                    <i data-lucide="database" class="w-5 h-5 text-white"></i>
-                    <span class="text-[8px] font-black uppercase tracking-tighter">Database</span>
-                </button>
+                <!-- Added Notif WA Button and Database Button Container -->
+                <div class="flex items-center gap-2">
+                    <button onclick="runManualNotif()" 
+                    class="p-3 bg-emerald-500/90 hover:bg-emerald-500 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50 shadow-lg">
+                        <i data-lucide="send" class="w-5 h-5 text-white"></i>
+                        <span class="text-[8px] font-black uppercase tracking-tighter text-white">Notif WA</span>
+                    </button>
+
+                    <button onclick="switchTab('master')" 
+                    class="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50">
+                        <i data-lucide="database" class="w-5 h-5 text-white"></i>
+                        <span class="text-[8px] font-black uppercase tracking-tighter">Database</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -524,8 +534,15 @@
                                 const skuKey = Object.keys(row).find(k => k.toLowerCase().includes('sku'));
                                 const descKey = Object.keys(row).find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('item'));
                                 if (row[skuKey] && row[descKey]) {
-                                    const newDoc = doc(collection(db, "master_products"));
-                                    batch.set(newDoc, { sku: row[skuKey].toString().toUpperCase(), itemDescription: row[descKey], createdAt: serverTimestamp() });
+                                    // ANTI DUPLICATE logic: Use SKU as Document ID
+                                    const sku = row[skuKey].toString().trim().toUpperCase();
+                                    if (!sku || !row[descKey]) return;
+                                    const newDoc = doc(db, "master_products", sku);
+                                    batch.set(newDoc, {
+                                        sku: sku,
+                                        itemDescription: row[descKey].toString().trim(),
+                                        createdAt: serverTimestamp()
+                                    });
                                 }
                             });
                             await batch.commit();
@@ -540,6 +557,21 @@
                 }
             });
         };
+
+        window.runManualNotif = async () => {
+            if (!verifyPin()) return;
+            try {
+                showNotif("MENGIRIM NOTIF...", "blue");
+                const res = await fetch('/api/notify');
+                const text = await res.text();
+                console.log(text);
+                showNotif("NOTIF WA BERHASIL", "emerald");
+            } catch (err) {
+                console.error(err);
+                showNotif("GAGAL KIRIM NOTIF", "red");
+            }
+        };
+
         lucide.createIcons();
     </script>
 </body>
