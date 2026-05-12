@@ -53,7 +53,7 @@
 
     <div class="max-w-md mx-auto relative min-h-screen bg-slate-50 border-x border-slate-200 shadow-2xl">
         
-        <!-- Header Section - Tetap Proporsional -->
+        <!-- Header Section -->
         <header class="gradient-header text-white pt-8 pb-14 px-7 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
             <div class="absolute -top-10 -right-10 opacity-10 pointer-events-none">
                 <i data-lucide="database" size="180"></i>
@@ -128,7 +128,7 @@
                 </div>
             </section>
 
-            <!-- Input View - DIRAPATKAN (space-y-2) -->
+            <!-- Input View -->
             <section id="view-input" class="hide px-6 space-y-2 animate-in slide-in-from-bottom-4">
                 <div class="bg-white p-4 rounded-[2.5rem] shadow-lg border border-slate-100">
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-2">Cari Nama / SKU</label>
@@ -144,7 +144,7 @@
                     <input type="hidden" id="form-sku">
                     <input type="hidden" id="form-desc">
                     
-                    <!-- Detail Produk Terpilih (Rapat & Clean) -->
+                    <!-- Detail Produk Terpilih -->
                     <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 flex items-start gap-3">
                         <div class="p-2 bg-white rounded-lg shadow-sm text-blue-600 border border-slate-100"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
                         <div class="flex-1 overflow-hidden">
@@ -169,7 +169,6 @@
                         <input type="date" id="form-date" required class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900">
                     </div>
 
-                    <!-- Tombol Simpan Solid & Tegas -->
                     <button type="submit" id="btn-save" class="w-full py-5 bg-blue-600 text-white rounded-3xl font-extrabold text-lg shadow-lg active:scale-95 transition-all">SIMPAN DATA</button>
                     
                     <button type="button" onclick="resetForm()" id="btn-cancel" class="hide w-full text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2">Batal Edit</button>
@@ -240,6 +239,7 @@
 
         let masterProducts = [];
         let inventoryData = [];
+        const ADMIN_PIN = "123456";
 
         const showNotif = (msg, type = 'blue') => {
             const box = document.getElementById('notif-box');
@@ -248,6 +248,17 @@
             box.innerText = msg;
             box.classList.remove('hide');
             setTimeout(() => box.classList.add('hide'), 3000);
+        };
+
+        const verifyPin = () => {
+            const pin = prompt("Masukkan PIN Admin");
+            if (!pin) return false;
+            if (pin === ADMIN_PIN) {
+                return true;
+            } else {
+                showNotif("PIN SALAH", "red");
+                return false;
+            }
         };
 
         onSnapshot(query(collection(db, "master_products"), orderBy("sku")), (snap) => {
@@ -442,6 +453,7 @@
         };
 
         window.editEntry = (id) => {
+            if (!verifyPin()) return;
             const item = inventoryData.find(i => i.id === id); if (!item) return;
             switchTab('input');
             document.getElementById('form-id').value = item.id;
@@ -458,6 +470,7 @@
         };
 
         window.deleteEntry = async (id) => {
+            if (!verifyPin()) return;
             if(!confirm("Hapus data ini?")) return;
             try { await deleteDoc(doc(db, "inventory_expired", id)); showNotif("DATA DIHAPUS", "red"); } catch (e) { showNotif("GAGAL HAPUS", "red"); }
         };
@@ -482,11 +495,16 @@
         };
 
         window.deleteMaster = async (id) => {
+            if (!verifyPin()) return;
             if(!confirm("Hapus SKU?")) return;
             try { await deleteDoc(doc(db, "master_products", id)); showNotif("SKU DIHAPUS", "red"); } catch (e) { showNotif("GAGAL", "red"); }
         };
 
         window.handleCSV = (e) => {
+            if (!verifyPin()) {
+                e.target.value = '';
+                return;
+            }
             const file = e.target.files[0];
             const btn = document.getElementById('btn-csv');
             if (!file) return;
