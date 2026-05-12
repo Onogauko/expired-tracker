@@ -2,8 +2,9 @@ name: Daily WhatsApp Expiry Notification
 
 on:
   workflow_dispatch:
+
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 22 * * *'
 
 jobs:
   notify:
