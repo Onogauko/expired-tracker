@@ -58,6 +58,7 @@
             color: #64748b;
             white-space: nowrap;
             flex-shrink: 0;
+            transition: all 0.2s;
         }
 
         .active-filter {
@@ -151,6 +152,7 @@
                 </div>
 
                 <div class="pt-2">
+                    <!-- Quick Filters -->
                     <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                         <button onclick="setQuickFilter('all')" class="quick-filter-btn active-filter">ALL</button>
                         <button onclick="setQuickFilter('expired')" class="quick-filter-btn">EXP</button>
@@ -185,6 +187,7 @@
                     <input type="hidden" id="form-sku">
                     <input type="hidden" id="form-desc">
                     
+                    <!-- Clean Selection Detail -->
                     <div class="-mt-2 p-3 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-blue-100 flex items-start gap-3 shadow-sm">
                         <div class="p-2 bg-white rounded-lg shadow-sm text-blue-600 border border-slate-100"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
                         <div class="flex-1 overflow-hidden">
@@ -215,12 +218,28 @@
                 </form>
             </section>
 
-            <!-- History View -->
+            <!-- Riwayat View -->
             <section id="view-history" class="hide px-6 space-y-4 animate-in slide-in-from-right-4">
                 <div class="flex justify-between items-center px-2">
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Riwayat Inventory</div>
-                    <i data-lucide="filter" class="w-4 h-4 text-slate-300"></i>
+                    
+                    <div class="flex items-center gap-2">
+                        <button 
+                            onclick="filterToday()"
+                            class="px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-wide"
+                        >
+                            Hari Ini
+                        </button>
+
+                        <input 
+                            type="date"
+                            id="history-date-filter"
+                            onchange="filterByDate(this.value)"
+                            class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold text-slate-600"
+                        >
+                    </div>
                 </div>
+                <!-- Search Box in Riwayat -->
                 <div class="relative">
                     <input 
                         type="text"
@@ -290,6 +309,7 @@
         let masterProducts = [];
         let inventoryData = [];
         let currentQuickFilter = 'all';
+        let historyDateFilter = '';
         const ADMIN_PIN = "123456";
 
         const showNotif = (msg, type = 'blue') => {
@@ -359,6 +379,22 @@
             updateStats();
             renderInventoryList();
         });
+
+        window.filterToday = () => {
+            const today = new Date().toISOString().split('T')[0];
+            historyDateFilter = today;
+            document.getElementById('history-date-filter').value = today;
+            renderInventoryList(
+                document.getElementById('history-search')?.value || ''
+            );
+        };
+
+        window.filterByDate = (date) => {
+            historyDateFilter = date;
+            renderInventoryList(
+                document.getElementById('history-search')?.value || ''
+            );
+        };
 
         window.setQuickFilter = (filter) => {
             currentQuickFilter = filter;
@@ -472,7 +508,6 @@
         const renderDashboardQuickList = () => {
             const list = document.getElementById('dashboard-quick-list');
             const today = new Date().setHours(0,0,0,0);
-            
             let filtered = [...inventoryData];
 
             if (currentQuickFilter === 'expired') {
@@ -508,13 +543,26 @@
             const list = document.getElementById('inventory-list');
             const today = new Date().setHours(0,0,0,0);
             
-            const filtered = search
+            let filtered = search
                 ? inventoryData.filter(item =>
                     item.sku?.toLowerCase().includes(search.toLowerCase()) ||
                     item.itemDescription?.toLowerCase().includes(search.toLowerCase()) ||
                     item.pic?.toLowerCase().includes(search.toLowerCase())
                 )
-                : inventoryData;
+                : [...inventoryData];
+
+            if (historyDateFilter) {
+                filtered = filtered.filter(item => {
+                    const ts = item.createdAt || item.updatedAt;
+                    if (!ts || !ts.toDate) return false;
+                    const d = ts.toDate();
+                    const localDate =
+                        d.getFullYear() + '-' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(d.getDate()).padStart(2, '0');
+                    return localDate === historyDateFilter;
+                });
+            }
 
             list.innerHTML = filtered.map(item => {
                 const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
@@ -653,10 +701,8 @@
                 showNotif("MENGIRIM NOTIF...", "blue");
                 const res = await fetch('/api/notify');
                 const text = await res.text();
-                console.log(text);
                 showNotif("NOTIF WA BERHASIL", "emerald");
             } catch (err) {
-                console.error(err);
                 showNotif("GAGAL KIRIM NOTIF", "red");
             }
         };
