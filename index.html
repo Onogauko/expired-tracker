@@ -491,7 +491,11 @@
             const today = new Date().setHours(0,0,0,0);
             const stats = { total: inventoryData.length, expired: 0, h7: 0, h30: 0, h90: 0 };
             inventoryData.forEach(item => {
-                const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                const expDate = new Date(item.expiredDate + 'T23:59:59');
+
+                const diff = Math.floor(
+                    (expDate - today) / 86400000
+                );
                 if (diff <= 0) stats.expired++;
                 else if (diff <= 7) stats.h7++;
                 else if (diff <= 30) stats.h30++;
@@ -512,24 +516,35 @@
 
             if (currentQuickFilter === 'expired') {
                 filtered = filtered.filter(item => {
-                    const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                    const expDate = new Date(item.expiredDate + 'T23:59:59');
+
+                    const diff = Math.floor(
+                        (expDate - today) / 86400000
+                    );
                     return diff <= 0;
                 });
             } else if (currentQuickFilter !== 'all') {
                 filtered = filtered.filter(item => {
-                    const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                    const expDate = new Date(item.expiredDate + 'T23:59:59');
+
+                    const diff = Math.floor(
+                        (expDate - today) / 86400000
+                    );
                     return diff > 0 && diff <= parseInt(currentQuickFilter);
                 });
             }
 
-            const sorted = filtered.sort((a, b) => new Date(a.expiredDate) - new Date(b.expiredDate)).slice(0, 10);
-
+            const sorted = filtered.sort((a, b) => new Date(a.expiredDate) - new Date(b.expiredDate)).slice(0, 3);
             if (sorted.length === 0) {
                 list.innerHTML = `<div class="text-center py-8 bg-white/40 rounded-[2rem] border border-dashed border-slate-200"><p class="text-[10px] font-bold text-slate-400 uppercase">Tidak ada data</p></div>`;
                 return;
             }
             list.innerHTML = sorted.map(item => {
-                const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                const expDate = new Date(item.expiredDate + 'T23:59:59');
+
+                const diff = Math.floor(
+                    (expDate - today) / 86400000
+                );
                 let badge = `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">${diff} Hari</span>`;
                 if (diff <= 0) badge = `<span class="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase">EXPIRED</span>`;
                 else if (diff <= 7) badge = `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">BAHAYA</span>`;
@@ -565,7 +580,11 @@
             }
 
             list.innerHTML = filtered.map(item => {
-                const diff = Math.ceil((new Date(item.expiredDate) - today) / 86400000);
+                const expDate = new Date(item.expiredDate + 'T23:59:59');
+
+                const diff = Math.floor(
+                    (expDate - today) / 86400000
+                );
                 let colorClass = 'bg-blue-500';
                 let tagClass = 'bg-blue-50 text-blue-600';
                 if (diff <= 0) { colorClass = 'bg-slate-900'; tagClass='bg-slate-100 text-slate-800'; }
