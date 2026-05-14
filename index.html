@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Expired Tracker Pro</title>
     
-    <!-- PWA Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -70,13 +69,17 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
+        
+        #confirm-modal {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body class="text-slate-900 min-h-screen pb-32">
 
     <div class="max-w-md mx-auto relative min-h-screen bg-slate-50 border-x border-slate-200 shadow-2xl">
         
-        <!-- Header Section -->
         <header class="gradient-header text-white pt-8 pb-14 px-7 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
             <div class="absolute -top-10 -right-10 opacity-10 pointer-events-none">
                 <i data-lucide="database" size="180"></i>
@@ -108,7 +111,6 @@
             </div>
         </header>
 
-        <!-- Navigation Tabs -->
         <div class="px-5 -mt-8 mb-4 relative z-20">
             <div class="flex bg-white p-1.5 rounded-2xl shadow-lg border border-slate-100">
                 <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-active">Beranda</button>
@@ -118,8 +120,6 @@
         </div>
 
         <main id="app-content">
-            
-            <!-- Dashboard View -->
             <section id="view-dashboard" class="px-6 space-y-4 animate-in fade-in duration-500">
                 <div class="grid grid-cols-2 gap-3">
                     <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 flex justify-between items-center">
@@ -152,7 +152,6 @@
                 </div>
 
                 <div class="pt-2">
-                    <!-- Quick Filters -->
                     <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                         <button onclick="setQuickFilter('all')" class="quick-filter-btn active-filter">ALL</button>
                         <button onclick="setQuickFilter('expired')" class="quick-filter-btn">EXP</button>
@@ -171,7 +170,6 @@
                 </div>
             </section>
 
-            <!-- Input View -->
             <section id="view-input" class="hide px-6 space-y-2 animate-in slide-in-from-bottom-4">
                 <div class="bg-white p-4 rounded-[2.5rem] shadow-lg border border-slate-100">
                     <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-2">Cari Nama / SKU</label>
@@ -187,7 +185,6 @@
                     <input type="hidden" id="form-sku">
                     <input type="hidden" id="form-desc">
                     
-                    <!-- Clean Selection Detail -->
                     <div class="-mt-2 p-3 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-blue-100 flex items-start gap-3 shadow-sm">
                         <div class="p-2 bg-white rounded-lg shadow-sm text-blue-600 border border-slate-100"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
                         <div class="flex-1 overflow-hidden">
@@ -218,42 +215,22 @@
                 </form>
             </section>
 
-            <!-- Riwayat View -->
             <section id="view-history" class="hide px-6 space-y-4 animate-in slide-in-from-right-4">
                 <div class="flex justify-between items-center px-2">
                     <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Riwayat Inventory</div>
                     
                     <div class="flex items-center gap-2">
-                        <button 
-                            onclick="filterToday()"
-                            class="px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-wide"
-                        >
-                            Hari Ini
-                        </button>
-
-                        <input 
-                            type="date"
-                            id="history-date-filter"
-                            onchange="filterByDate(this.value)"
-                            class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold text-slate-600"
-                        >
+                        <button onclick="filterToday()" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-wide">Hari Ini</button>
+                        <input type="date" id="history-date-filter" onchange="filterByDate(this.value)" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold text-slate-600">
                     </div>
                 </div>
-                <!-- Search Box in Riwayat -->
                 <div class="relative">
-                    <input 
-                        type="text"
-                        id="history-search"
-                        oninput="renderInventoryList(this.value)"
-                        placeholder="Cari SKU / item..."
-                        class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold pl-12 shadow-sm"
-                    >
+                    <input type="text" id="history-search" oninput="renderInventoryList(this.value)" placeholder="Cari SKU / item..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold pl-12 shadow-sm">
                     <i data-lucide="search" class="absolute left-4 top-4 text-slate-300 w-4 h-4"></i>
                 </div>
                 <div id="inventory-list" class="space-y-4"></div>
             </section>
 
-            <!-- Master View -->
             <section id="view-master" class="hide px-6 space-y-4 animate-in fade-in">
                 <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between gap-3">
                     <div class="flex flex-col">
@@ -280,7 +257,6 @@
 
         </main>
 
-        <!-- Bottom Navigation Bar -->
         <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-8 py-5 flex justify-around items-center z-[100] max-w-md mx-auto rounded-t-[2.5rem] shadow-2xl">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="p-2 text-blue-600 scale-110"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></button>
             <button onclick="switchTab('input')" id="nav-input" class="p-3 text-slate-300 transition-all"><i data-lucide="plus" class="w-6 h-6"></i></button>
@@ -288,6 +264,20 @@
         </nav>
 
         <div id="notif-box" class="hide fixed bottom-24 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[150] text-white font-bold text-xs text-center animate-in slide-in-from-bottom-10"></div>
+    </div>
+    
+    <div id="confirm-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center space-y-4">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-extrabold text-slate-800 uppercase tracking-tight">Konfirmasi</h3>
+            <p id="confirm-message" class="text-xs text-slate-500 font-bold leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button id="confirm-cancel" class="flex-1 py-3 bg-slate-100 text-slate-400 rounded-xl text-[10px] font-black uppercase tracking-widest">Batal</button>
+                <button id="confirm-ok" class="flex-1 py-3 bg-red-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Hapus</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -320,6 +310,28 @@
             box.classList.remove('hide');
             setTimeout(() => box.classList.add('hide'), 3000);
         };
+        
+        const customConfirm = (msg) => {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const message = document.getElementById('confirm-message');
+                const okBtn = document.getElementById('confirm-ok');
+                const cancelBtn = document.getElementById('confirm-cancel');
+                
+                message.innerText = msg;
+                modal.classList.remove('hidden');
+                
+                const cleanup = (val) => {
+                    modal.classList.add('hidden');
+                    okBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    resolve(val);
+                };
+                
+                okBtn.onclick = () => cleanup(true);
+                cancelBtn.onclick = () => cleanup(false);
+            });
+        };
 
         const verifyPin = () => {
             const pin = prompt("Masukkan PIN Admin");
@@ -332,14 +344,10 @@
             }
         };
 
-        // Helper format tanggal Indonesia
         const formatTanggalID = (dateStr) => {
             if (!dateStr) return '---';
             const d = new Date(dateStr);
-            const bulan = [
-                "Januari","Februari","Maret","April","Mei","Juni",
-                "Juli","Agustus","September","Oktober","November","Desember"
-            ];
+            const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
             const tgl = String(d.getDate()).padStart(2, '0');
             const bln = bulan[d.getMonth()];
             const thn = d.getFullYear();
@@ -384,23 +392,17 @@
             const today = new Date().toISOString().split('T')[0];
             historyDateFilter = today;
             document.getElementById('history-date-filter').value = today;
-            renderInventoryList(
-                document.getElementById('history-search')?.value || ''
-            );
+            renderInventoryList(document.getElementById('history-search')?.value || '');
         };
 
         window.filterByDate = (date) => {
             historyDateFilter = date;
-            renderInventoryList(
-                document.getElementById('history-search')?.value || ''
-            );
+            renderInventoryList(document.getElementById('history-search')?.value || '');
         };
 
         window.setQuickFilter = (filter) => {
             currentQuickFilter = filter;
-            document.querySelectorAll('.quick-filter-btn').forEach(btn => {
-                btn.classList.remove('active-filter');
-            });
+            document.querySelectorAll('.quick-filter-btn').forEach(btn => btn.classList.remove('active-filter'));
             event.target.classList.add('active-filter');
             renderDashboardQuickList();
         };
@@ -409,7 +411,6 @@
             const views = ['dashboard', 'input', 'history', 'master'];
             views.forEach(v => document.getElementById(`view-${v}`).classList.add('hide'));
             document.getElementById(`view-${tab}`).classList.remove('hide');
-            
             const navs = ['dashboard', 'input', 'history'];
             navs.forEach(n => {
                 const btn = document.getElementById(`nav-${n}`);
@@ -423,10 +424,7 @@
         window.handleMasterSearch = (val) => {
             const dropdown = document.getElementById('search-dropdown');
             if (val.length < 2) { dropdown.classList.add('hide'); return; }
-            const filtered = masterProducts.filter(p => 
-                p.sku?.toLowerCase().includes(val.toLowerCase()) || 
-                p.itemDescription?.toLowerCase().includes(val.toLowerCase())
-            ).slice(0, 10);
+            const filtered = masterProducts.filter(p => p.sku?.toLowerCase().includes(val.toLowerCase()) || p.itemDescription?.toLowerCase().includes(val.toLowerCase())).slice(0, 10);
             dropdown.innerHTML = filtered.map(p => `
                 <div onclick="selectProduct('${p.sku}', '${p.itemDescription.replace(/'/g, "\\'")}')" class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col">
                     <span class="font-black text-blue-700 text-sm">${p.sku}</span>
@@ -465,11 +463,7 @@
                     await updateDoc(doc(db, "inventory_expired", id), payload);
                     showNotif("Data diperbarui!", "emerald");
                 } else {
-                    await addDoc(collection(db, "inventory_expired"), {
-                        ...payload,
-                        createdAt: serverTimestamp(),
-                        notificationFlags: {}
-                    });
+                    await addDoc(collection(db, "inventory_expired"), { ...payload, createdAt: serverTimestamp(), notificationFlags: {} });
                     showNotif("Data disimpan!", "blue");
                 }
                 resetForm();
@@ -491,11 +485,10 @@
             const today = new Date().setHours(0,0,0,0);
             const stats = { total: inventoryData.length, expired: 0, h7: 0, h30: 0, h90: 0 };
             inventoryData.forEach(item => {
-                const expDate = new Date(item.expiredDate + 'T23:59:59');
+                const expDate = new Date(item.expiredDate);
+                expDate.setHours(0,0,0,0);
 
-                const diff = Math.floor(
-                    (expDate - today) / 86400000
-                );
+                const diff = Math.floor((expDate - today) / 86400000);
                 if (diff <= 0) stats.expired++;
                 else if (diff <= 7) stats.h7++;
                 else if (diff <= 30) stats.h30++;
@@ -516,20 +509,15 @@
 
             if (currentQuickFilter === 'expired') {
                 filtered = filtered.filter(item => {
-                    const expDate = new Date(item.expiredDate + 'T23:59:59');
-
-                    const diff = Math.floor(
-                        (expDate - today) / 86400000
-                    );
-                    return diff <= 0;
+                    const expDate = new Date(item.expiredDate);
+                    expDate.setHours(0,0,0,0);
+                    return Math.floor((expDate - today) / 86400000) <= 0;
                 });
             } else if (currentQuickFilter !== 'all') {
                 filtered = filtered.filter(item => {
-                    const expDate = new Date(item.expiredDate + 'T23:59:59');
-
-                    const diff = Math.floor(
-                        (expDate - today) / 86400000
-                    );
+                    const expDate = new Date(item.expiredDate);
+                    expDate.setHours(0,0,0,0);
+                    const diff = Math.floor((expDate - today) / 86400000);
                     return diff > 0 && diff <= parseInt(currentQuickFilter);
                 });
             }
@@ -540,11 +528,9 @@
                 return;
             }
             list.innerHTML = sorted.map(item => {
-                const expDate = new Date(item.expiredDate + 'T23:59:59');
-
-                const diff = Math.floor(
-                    (expDate - today) / 86400000
-                );
+                const expDate = new Date(item.expiredDate);
+                expDate.setHours(0,0,0,0);
+                const diff = Math.floor((expDate - today) / 86400000);
                 let badge = `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">${diff} Hari</span>`;
                 if (diff <= 0) badge = `<span class="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase">EXPIRED</span>`;
                 else if (diff <= 7) badge = `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">BAHAYA</span>`;
@@ -557,34 +543,19 @@
         window.renderInventoryList = (search = '') => {
             const list = document.getElementById('inventory-list');
             const today = new Date().setHours(0,0,0,0);
-            
-            let filtered = search
-                ? inventoryData.filter(item =>
-                    item.sku?.toLowerCase().includes(search.toLowerCase()) ||
-                    item.itemDescription?.toLowerCase().includes(search.toLowerCase()) ||
-                    item.pic?.toLowerCase().includes(search.toLowerCase())
-                )
-                : [...inventoryData];
-
+            let filtered = search ? inventoryData.filter(item => item.sku?.toLowerCase().includes(search.toLowerCase()) || item.itemDescription?.toLowerCase().includes(search.toLowerCase()) || item.pic?.toLowerCase().includes(search.toLowerCase())) : [...inventoryData];
             if (historyDateFilter) {
                 filtered = filtered.filter(item => {
                     const ts = item.createdAt || item.updatedAt;
                     if (!ts || !ts.toDate) return false;
                     const d = ts.toDate();
-                    const localDate =
-                        d.getFullYear() + '-' +
-                        String(d.getMonth() + 1).padStart(2, '0') + '-' +
-                        String(d.getDate()).padStart(2, '0');
-                    return localDate === historyDateFilter;
+                    return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')) === historyDateFilter;
                 });
             }
-
             list.innerHTML = filtered.map(item => {
-                const expDate = new Date(item.expiredDate + 'T23:59:59');
-
-                const diff = Math.floor(
-                    (expDate - today) / 86400000
-                );
+                const expDate = new Date(item.expiredDate);
+                expDate.setHours(0,0,0,0);
+                const diff = Math.floor((expDate - today) / 86400000);
                 let colorClass = 'bg-blue-500';
                 let tagClass = 'bg-blue-50 text-blue-600';
                 if (diff <= 0) { colorClass = 'bg-slate-900'; tagClass='bg-slate-100 text-slate-800'; }
@@ -637,7 +608,8 @@
 
         window.deleteEntry = async (id) => {
             if (!verifyPin()) return;
-            if(!confirm("Hapus data ini?")) return;
+            const confirmed = await customConfirm("Apakah Anda yakin ingin menghapus data inventory ini?");
+            if(!confirmed) return;
             try { await deleteDoc(doc(db, "inventory_expired", id)); showNotif("DATA DIHAPUS", "red"); } catch (e) { showNotif("GAGAL HAPUS", "red"); }
         };
 
@@ -662,15 +634,13 @@
 
         window.deleteMaster = async (id) => {
             if (!verifyPin()) return;
-            if(!confirm("Hapus SKU?")) return;
+            const confirmed = await customConfirm("Hapus SKU ini dari Master?");
+            if(!confirmed) return;
             try { await deleteDoc(doc(db, "master_products", id)); showNotif("SKU DIHAPUS", "red"); } catch (e) { showNotif("GAGAL", "red"); }
         };
 
         window.handleCSV = (e) => {
-            if (!verifyPin()) {
-                e.target.value = '';
-                return;
-            }
+            if (!verifyPin()) { e.target.value = ''; return; }
             const file = e.target.files[0];
             const btn = document.getElementById('btn-csv');
             if (!file) return;
@@ -690,15 +660,10 @@
                                 const skuKey = Object.keys(row).find(k => k.toLowerCase().includes('sku'));
                                 const descKey = Object.keys(row).find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('item'));
                                 if (row[skuKey] && row[descKey]) {
-                                    // ANTI DUPLICATE logic: Use SKU as Document ID
                                     const sku = row[skuKey].toString().trim().toUpperCase();
                                     if (!sku || !row[descKey]) return;
                                     const newDoc = doc(db, "master_products", sku);
-                                    batch.set(newDoc, {
-                                        sku: sku,
-                                        itemDescription: row[descKey].toString().trim(),
-                                        createdAt: serverTimestamp()
-                                    });
+                                    batch.set(newDoc, { sku: sku, itemDescription: row[descKey].toString().trim(), createdAt: serverTimestamp() });
                                 }
                             });
                             await batch.commit();
