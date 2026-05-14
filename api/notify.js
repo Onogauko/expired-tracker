@@ -27,8 +27,11 @@ module.exports = async (req, res) => {
 
         let items = [];
 
-        const now = new Date();
-        now.setHours(0, 0, 0, 0);
+        // =========================
+        // TANGGAL HARI INI
+        // =========================
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         const bulanIndo = [
             "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
@@ -44,10 +47,21 @@ module.exports = async (req, res) => {
 
             if (data.expiredDate && data.itemDescription) {
 
-                const expDate = new Date(data.expiredDate);
+                // =========================
+                // FIX PERHITUNGAN EXPIRED
+                // =========================
+                const expDate = new Date(data.expiredDate + 'T23:59:59');
 
-                const diffTime = expDate - now;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.floor(
+                    (expDate - today) / 86400000
+                );
+
+                // =========================
+                // STOP NOTIF SETELAH EXPIRED
+                // =========================
+                if (diffDays < 0) {
+                    return;
+                }
 
                 const tgl = expDate.getDate();
                 const bln = bulanIndo[expDate.getMonth()];
@@ -62,7 +76,6 @@ module.exports = async (req, res) => {
                 // DETEKSI SEMUA KEMUNGKINAN
                 // =========================
 
-                // Jika field langsung di document
                 if (data.sku) {
                     skuValue = data.sku;
                 }
@@ -71,7 +84,6 @@ module.exports = async (req, res) => {
                     qtyValue = data.qty;
                 }
 
-                // Jika di notificationFlags object
                 if (data.notificationFlags && typeof data.notificationFlags === 'object') {
 
                     skuValue =
@@ -85,7 +97,6 @@ module.exports = async (req, res) => {
                         qtyValue;
                 }
 
-                // Jika notificationFlags string JSON
                 if (data.notificationFlags && typeof data.notificationFlags === 'string') {
 
                     try {
@@ -110,20 +121,19 @@ module.exports = async (req, res) => {
                 console.log("FINAL SKU:", skuValue);
                 console.log("FINAL QTY:", qtyValue);
 
-                if (diffDays >= 0) {
-
-                    items.push({
-                        nama: data.itemDescription,
-                        sku: skuValue,
-                        qty: qtyValue,
-                        expFormatted: formatTanggalIndo,
-                        daysLeft: diffDays
-                    });
-
-                }
+                items.push({
+                    nama: data.itemDescription,
+                    sku: skuValue,
+                    qty: qtyValue,
+                    expFormatted: formatTanggalIndo,
+                    daysLeft: diffDays
+                });
             }
         });
 
+        // =========================
+        // SORT TERDEKAT
+        // =========================
         items.sort((a, b) => a.daysLeft - b.daysLeft);
 
         if (items.length > 0) {
