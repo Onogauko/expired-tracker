@@ -1,758 +1,932 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Expired Tracker Pro</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ExpTracker">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2907/2907150.png">
-    <meta name="theme-color" content="#2563eb">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Expired Control D&D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.2/papaparse.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
-            background-color: #f8fafc;
-        }
-        .tab-active { 
-            background-color: #2563eb; 
-            color: white; 
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); 
-        }
-        .tab-inactive { color: #94a3b8; font-weight: 600; }
-        .hide { display: none !important; }
-        
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-        
-        input:focus {
-            border-color: #2563eb;
-            outline: none;
-        }
+<!-- PWA Manifest & Theme -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6d28d9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Expired Control">
 
-        .gradient-header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        }
+<style>
+:root {
+  --violet: #6d28d9; --violet-light: #ede9fe; --violet-mid: #8b5cf6;
+  --red: #dc2626; --red-light: #fee2e2;
+  --amber: #d97706; --amber-light: #fef3c7;
+  --green: #059669; --green-light: #d1fae5;
+  --surface: #ffffff; --bg: #f5f3ff;
+  --border: #e8e3f7; --text: #1c1033;
+  --text-2: #6b7280; --text-3: #a78bfa;
+  --radius: 16px; --radius-sm: 10px;
+}
 
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            cursor: pointer;
-        }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); max-width: 430px; margin: 0 auto; min-height: 100vh; }
 
-        .quick-filter-btn {
-            padding: 10px 16px;
-            border-radius: 999px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            font-size: 10px;
-            font-weight: 900;
-            color: #64748b;
-            white-space: nowrap;
-            flex-shrink: 0;
-            transition: all 0.2s;
-        }
+/* HEADER */
+.header { background: var(--violet); padding: 50px 20px 0; position: sticky; top: 0; z-index: 50; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.header-title { color: #fff; font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+.header-date { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 2px; }
+.sync-btn { background: rgba(255,255,255,0.15); border: none; color: white; border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+.sync-btn:active { background: rgba(255,255,255,0.25); }
 
-        .active-filter {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
+/* ADMIN CONTACTS */
+.admin-contacts {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        
-        #confirm-modal {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-        }
-    </style>
+.admin-avatar {
+  position: relative;
+}
+
+.admin-avatar img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,.4);
+  cursor: pointer;
+}
+
+.admin-avatar .avatar-placeholder {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--violet);
+  font-size: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  cursor: pointer;
+}
+
+.contact-popup {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 150px;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+}
+
+.contact-popup.show {
+  display: block;
+}
+
+.contact-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.contact-popup button {
+  width: 100%;
+  border: none;
+  background: #25D366;
+  color: white;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: rgba(0,0,0,0.2); border-radius: 12px 12px 0 0; padding: 5px 5px 0; margin-top: 10px; }
+.tab-btn { flex: 1; background: transparent; border: none; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; padding: 10px 0 12px; border-radius: 9px 9px 0 0; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; position: relative; }
+.tab-btn.active { background: var(--bg); color: var(--violet); font-weight: 700; }
+
+.tab-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  min-width: 18px;
+  text-align: center;
+  display: none;
+}
+
+.tab-badge.show {
+  display: inline-block;
+}
+
+/* CONTENT */
+.main { flex: 1; overflow-y: auto; padding: 16px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* CARD & INPUT - DENGAN PERUBAHAN */
+.form-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 16px; margin-bottom: 14px; }
+
+/* SEARCH BAR - STICKY DI ATAS SCANNER */
+.search-sticky {
+  margin-bottom: 12px;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 10;
+  padding: 0 0 4px 0;
+}
+
+.search-sticky .inp {
+  margin-bottom: 0;
+}
+
+/* TAMBAHAN CSS UNTUK SEARCH RESULTS SCROLL - OPSI 4 */
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+/* SCAN AREA - DIPERKECIL */
+.scan-area { 
+  background: var(--violet); 
+  border-radius: 12px; 
+  padding: 12px; 
+  text-align: center; 
+  margin-bottom: 14px; 
+  cursor: pointer; 
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), box-shadow 0.2s; 
+  box-shadow: 0 2px 12px rgba(109,40,217,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.scan-area:active { transform: scale(0.97); }
+.scan-area-icon { font-size: 20px; margin-bottom: 0; }
+.scan-area-text { font-weight: 600; font-size: 13px; color: #fff; }
+.scan-area-sub { font-size: 10px; color: rgba(255,255,255,0.65); margin-left: 4px; }
+
+.inp { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 13px; font-size: 13px; margin-bottom: 8px; outline: none; font-family: 'DM Sans', sans-serif; color: var(--text); transition: border-color 0.2s; }
+.inp:focus { border-color: var(--violet-mid); background: #faf8ff; }
+.inp:last-of-type { margin-bottom: 0; }
+.btn-primary { background: var(--violet); color: white; border: none; border-radius: 10px; padding: 13px; width: 100%; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'DM Sans', sans-serif; margin-top: 10px; transition: opacity 0.2s, transform 0.15s; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.55; }
+
+/* LIST ITEM */
+.section-label { font-size: 11px; font-weight: 700; color: var(--text-3); margin-bottom: 10px; letter-spacing: 0.05em; }
+.recent-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; margin-bottom: 7px; display: flex; align-items: center; gap: 10px; animation: fadeInUp 0.3s cubic-bezier(0.2, 0.8, 0.4, 1); transition: all 0.2s ease; }
+.recent-item:active { transform: scale(0.98); background: var(--violet-light); }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.ri-info { flex: 1; min-width: 0; }
+.ri-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ri-meta { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+/* PULL CARD */
+.pull-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; border-left: 4px solid var(--red); padding: 12px 13px; margin-bottom: 8px; transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1); animation: slideInLeft 0.3s ease; }
+.pull-card:active { transform: scale(0.98); }
+.pull-card.amber { border-left-color: var(--amber); }
+.pull-card.green { border-left-color: var(--green); }
+.pull-card.done { opacity: 0.38; }
+.pull-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.pull-name { font-size: 13px; font-weight: 600; }
+.pull-meta { font-size: 11px; color: var(--text-2); margin-top: 3px; }
+.check-box { min-width: 28px; height: 28px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
+.check-box:active { transform: scale(0.9); }
+.check-box.checked { background: var(--green); border-color: var(--green); }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-2); font-size: 13px; }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+/* SCANNER OVERLAY */
+.scanner-overlay { position: fixed; inset: 0; background: #000; z-index: 200; display: none; flex-direction: column; }
+.scanner-overlay.open { display: flex; }
+.scanner-header { padding: 54px 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+.scanner-title { color: white; font-weight: 700; font-size: 16px; }
+.scanner-close { background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.scanner-hint { color: rgba(255,255,255,0.5); font-size: 12px; text-align: center; padding: 0 20px 10px; }
+#html5-qrcode-container { flex: 1; }
+
+.scanner-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 240px; height: 240px; pointer-events: none; z-index: 210; }
+.scanner-frame::before, .scanner-frame::after { content: ''; position: absolute; width: 36px; height: 36px; border-color: #fff; border-style: solid; }
+.scanner-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.scanner-frame::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+.scanner-frame-tr, .scanner-frame-bl { position: absolute; width: 36px; height: 36px; border-color: #fff; border-style: solid; }
+.scanner-frame-tr { top: 0; right: 0; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+.scanner-frame-bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+@keyframes scanLine { 0% { top: 10%; } 100% { top: 90%; } }
+.scan-line { position: absolute; left: 5%; right: 5%; height: 2px; background: linear-gradient(90deg, transparent, #6d28d9, #a78bfa, #6d28d9, transparent); border-radius: 2px; animation: scanLine 1.8s ease-in-out infinite alternate; z-index: 211; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 1000;
+  max-width: 90%;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* TAMBAHAN CSS UNTUK CARD MERAH */
+.not-registered {
+  border: 2px solid #fca5a5 !important;
+  background: #fef2f2 !important;
+}
+
+.not-registered-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #dc2626;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.lokasi-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.lokasi-chip { background: var(--violet-light); color: var(--violet); border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.lokasi-chip:active { transform: scale(0.95); background: var(--violet-mid); color: white; }
+
+.search-item { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 4px; cursor: pointer; transition: all 0.15s; }
+.search-item:active { transform: scale(0.98); background: var(--violet-light); }
+.search-item-name { font-size: 13px; font-weight: 600; }
+.search-item-barcode { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+/* OFFLINE INDICATOR */
+.offline-indicator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #dc2626;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+.offline-indicator.show { transform: translateY(0); }
+.online-indicator {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #059669;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+.online-indicator.show { transform: translateY(0); }
+
+/* EXPIRED CARD */
+.expired-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  border-left: 4px solid var(--red);
+  padding: 12px 13px;
+  margin-bottom: 8px;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
+  animation: slideInLeft 0.3s ease;
+}
+.expired-card:active { transform: scale(0.98); }
+.expired-name { font-size: 13px; font-weight: 600; }
+.expired-meta { font-size: 11px; color: var(--text-2); margin-top: 3px; }
+.expired-badge {
+  background: var(--red);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+</style>
 </head>
-<body class="text-slate-900 min-h-screen pb-32">
+<body>
 
-    <div class="max-w-md mx-auto relative min-h-screen bg-slate-50 border-x border-slate-200 shadow-2xl">
-        
-        <header class="gradient-header text-white pt-8 pb-14 px-7 rounded-b-[2.5rem] shadow-xl relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 opacity-10 pointer-events-none">
-                <i data-lucide="database" size="180"></i>
-            </div>
-            
-            <div class="flex justify-between items-center relative z-10">
-                <div class="text-left">
-                    <h1 class="text-2xl font-extrabold tracking-tight uppercase leading-none">Expired Tracker</h1>
-                    <div class="mt-2 space-y-0.5 opacity-90">
-                        <p id="header-last-date" class="text-blue-100 text-[7.5px] font-bold uppercase tracking-wider">Terakhir diinput : ---</p>
-                        <p id="header-last-pic" class="text-blue-100 text-[7.5px] font-bold uppercase tracking-wider">Oleh : ---</p>
-                        <p id="header-last-time" class="text-blue-100 text-[7.5px] font-bold uppercase tracking-wider">Waktu : ---</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <button onclick="runManualNotif()" 
-                    class="p-3 bg-emerald-500/90 hover:bg-emerald-500 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50 shadow-lg">
-                        <i data-lucide="send" class="w-5 h-5 text-white"></i>
-                        <span class="text-[8px] font-black uppercase tracking-tighter text-white">Notif WA</span>
-                    </button>
+<div class="toast" id="toast"></div>
+<div class="offline-indicator" id="offlineIndicator">📡 Mode Offline - Data disimpan sementara</div>
+<div class="online-indicator" id="onlineIndicator">✅ Kembali Online - Sinkronisasi otomatis</div>
 
-                    <button onclick="switchTab('master')" 
-                    class="p-3 bg-white/10 hover:bg-white/20 rounded-2xl border border-white/20 transition-all active:scale-90 flex flex-col items-center gap-1 z-50">
-                        <i data-lucide="database" class="w-5 h-5 text-white"></i>
-                        <span class="text-[8px] font-black uppercase tracking-tighter">Database</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-header">
+    <span class="scanner-title">📷 Scan Barcode</span>
+    <button class="scanner-close" onclick="closeScanner()">Tutup</button>
+  </div>
+  <p class="scanner-hint">Arahkan kamera ke barcode produk</p>
+  <div style="position:relative; flex:1;">
+    <div id="html5-qrcode-container" style="width:100%;height:100%;"></div>
+    <div class="scanner-frame">
+      <div class="scan-line"></div>
+      <div class="scanner-frame-tr"></div>
+      <div class="scanner-frame-bl"></div>
+    </div>
+  </div>
+</div>
 
-        <div class="px-5 -mt-8 mb-4 relative z-20">
-            <div class="flex bg-white p-1.5 rounded-2xl shadow-lg border border-slate-100">
-                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-active">Beranda</button>
-                <button onclick="switchTab('input')" id="btn-input" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Input</button>
-                <button onclick="switchTab('history')" id="btn-history" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Riwayat</button>
-                <button onclick="switchTab('archive')" id="btn-archive" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive">Arsip</button>
-            </div>
-        </div>
-
-        <main id="app-content">
-            <section id="view-dashboard" class="px-6 space-y-4 animate-in fade-in duration-500">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 flex justify-between items-center">
-                        <div>
-                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Monitored</p>
-                            <div id="stat-total" class="text-3xl font-black text-slate-800">0</div>
-                        </div>
-                        <div class="p-4 bg-blue-50 text-blue-600 rounded-3xl"><i data-lucide="package" class="w-7 h-7"></i></div>
-                    </div>
-                    
-                    <div class="bg-slate-900 p-5 rounded-[2rem] shadow-sm">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Sudah Expired</p>
-                        <div id="stat-expired" class="text-3xl font-black text-white">0</div>
-                    </div>
-
-                    <div class="bg-red-50 p-5 rounded-[2rem] border border-red-100 shadow-sm">
-                        <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-1">H-7 Alert</p>
-                        <div id="stat-h7" class="text-3xl font-black text-red-600">0</div>
-                    </div>
-                    
-                    <div class="bg-orange-50 p-5 rounded-[2rem] border border-orange-100 shadow-sm">
-                        <p class="text-[9px] font-black text-orange-600 uppercase tracking-widest mb-1">H-30 Alert</p>
-                        <div id="stat-h30" class="text-3xl font-black text-orange-700">0</div>
-                    </div>
-
-                    <div class="bg-blue-50 p-5 rounded-[2rem] border border-blue-100 shadow-sm">
-                        <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">H-90 Alert</p>
-                        <div id="stat-h90" class="text-3xl font-black text-blue-700">0</div>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                        <button onclick="setQuickFilter('all')" class="quick-filter-btn active-filter">ALL</button>
-                        <button onclick="setQuickFilter('expired')" class="quick-filter-btn">EXP</button>
-                        <button onclick="setQuickFilter('1')" class="quick-filter-btn">H-1</button>
-                        <button onclick="setQuickFilter('3')" class="quick-filter-btn">H-3</button>
-                        <button onclick="setQuickFilter('7')" class="quick-filter-btn">H-7</button>
-                        <button onclick="setQuickFilter('30')" class="quick-filter-btn">H-30</button>
-                        <button onclick="setQuickFilter('90')" class="quick-filter-btn">H-90</button>
-                    </div>
-
-                    <div class="flex justify-between items-center mb-3 px-2 mt-2">
-                        <h2 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Paling Mendesak</h2>
-                        <button onclick="switchTab('history')" class="text-[9px] font-bold text-blue-600 uppercase">Lihat Semua</button>
-                    </div>
-                    <div id="dashboard-quick-list" class="space-y-3"></div>
-                </div>
-            </section>
-
-            <section id="view-input" class="hide px-6 space-y-2 animate-in slide-in-from-bottom-4">
-                <div class="bg-white p-4 rounded-[2.5rem] shadow-lg border border-slate-100">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-2">Cari Nama / SKU</label>
-                    <div class="relative">
-                        <input type="text" id="master-search-input" oninput="handleMasterSearch(this.value)" placeholder="Ketik minimal 2 huruf..." class="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none font-bold text-slate-700 pl-12">
-                        <i data-lucide="search" class="absolute left-4 top-4 text-slate-400 w-5 h-5"></i>
-                        <div id="search-dropdown" class="absolute w-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto hide"></div>
-                    </div>
-                </div>
-
-                <form id="expiry-form" class="bg-white p-5 rounded-[2.5rem] shadow-xl space-y-4 border border-slate-100 opacity-40 pointer-events-none transition-all">
-                    <input type="hidden" id="form-id">
-                    <input type="hidden" id="form-sku">
-                    <input type="hidden" id="form-desc">
-                    
-                    <div class="-mt-2 p-3 bg-gradient-to-br from-blue-50 to-white rounded-2xl border-2 border-blue-100 flex items-start gap-3 shadow-sm">
-                        <div class="p-2 bg-white rounded-lg shadow-sm text-blue-600 border border-slate-100"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
-                        <div class="flex-1 overflow-hidden">
-                            <div id="display-desc" class="font-extrabold text-[13px] text-slate-800 leading-tight uppercase truncate">Menunggu pilihan produk</div>
-                            <div id="display-sku" class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest">---</div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Qty</label>
-                            <input type="number" id="form-qty" required class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">PIC</label>
-                            <input type="text" id="form-pic" required class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold uppercase">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tanggal Expired</label>
-                        <input type="date" id="form-date" required class="w-full p-4 bg-blue-50 border-2 border-blue-100 rounded-2xl font-black text-blue-900">
-                    </div>
-
-                    <button type="submit" id="btn-save" class="w-full py-5 bg-blue-600 text-white rounded-3xl font-extrabold text-lg shadow-lg active:scale-95 transition-all">SIMPAN DATA</button>
-                    
-                    <button type="button" onclick="resetForm()" id="btn-cancel" class="hide w-full text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-2">Batal Edit</button>
-                </form>
-            </section>
-
-            <section id="view-history" class="hide px-6 space-y-4 animate-in slide-in-from-right-4">
-                <div class="flex justify-between items-center px-2">
-                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Riwayat Inventory</div>
-                    
-                    <div class="flex items-center gap-2">
-                        <button onclick="filterToday()" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-wide">Hari Ini</button>
-                        <input type="date" id="history-date-filter" onchange="filterByDate(this.value)" class="bg-white border border-slate-200 rounded-xl px-3 py-2 text-[10px] font-bold text-slate-600">
-                    </div>
-                </div>
-                <div class="relative">
-                    <input type="text" id="history-search" oninput="renderInventoryList(this.value)" placeholder="Cari SKU / item..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold pl-12 shadow-sm">
-                    <i data-lucide="search" class="absolute left-4 top-4 text-slate-300 w-4 h-4"></i>
-                </div>
-                <div id="inventory-list" class="space-y-4"></div>
-            </section>
-
-            <!-- Archive View -->
-            <section id="view-archive" class="hide px-6 space-y-4 animate-in slide-in-from-right-4">
-                <div class="flex justify-between items-center px-2">
-                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        Arsip Expired
-                    </div>
-                </div>
-                <div id="archive-list" class="space-y-4"></div>
-            </section>
-
-            <section id="view-master" class="hide px-6 space-y-4 animate-in fade-in">
-                <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between gap-3">
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-slate-400 uppercase">Import CSV</span>
-                        <span class="text-[9px] text-blue-500 font-bold">sku, description</span>
-                    </div>
-                    <input type="file" id="csv-input" accept=".csv" class="hide" onchange="handleCSV(event)">
-                    <button onclick="document.getElementById('csv-input').click()" id="btn-csv" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-black text-[10px] flex items-center gap-2 shadow-lg active:scale-95">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i> PILIH FILE
-                    </button>
-                </div>
-
-                <div class="relative">
-                    <input type="text" oninput="renderMasterList(this.value)" placeholder="Cari SKU di master..." class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-xs font-bold pl-12 shadow-sm">
-                    <i data-lucide="search" class="absolute left-4 top-4 text-slate-300 w-4 h-4"></i>
-                </div>
-
-                <div class="flex justify-between items-center px-4">
-                    <div id="master-count" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">0 SKU Terdaftar</div>
-                    <button onclick="switchTab('dashboard')" class="text-[10px] font-black text-blue-600">KEMBALI</button>
-                </div>
-                <div id="master-list" class="space-y-2"></div>
-            </section>
-
-        </main>
-
-        <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-8 py-5 flex justify-around items-center z-[100] max-w-md mx-auto rounded-t-[2.5rem] shadow-2xl">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="p-2 text-blue-600 scale-110"><i data-lucide="layout-dashboard" class="w-6 h-6"></i></button>
-            <button onclick="switchTab('input')" id="nav-input" class="p-3 text-slate-300 transition-all"><i data-lucide="plus" class="w-6 h-6"></i></button>
-            <button onclick="switchTab('history')" id="nav-history" class="p-2 text-slate-300 transition-all"><i data-lucide="history" class="w-6 h-6"></i></button>
-        </nav>
-
-        <div id="notif-box" class="hide fixed bottom-24 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[150] text-white font-bold text-xs text-center animate-in slide-in-from-bottom-10"></div>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">Expired Control D&D</div>
+      <div class="header-date" id="headerDate"></div>
     </div>
     
-    <div id="confirm-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6">
-        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl text-center space-y-4">
-            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
-                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
-            </div>
-            <h3 class="font-extrabold text-slate-800 uppercase tracking-tight">Konfirmasi</h3>
-            <p id="confirm-message" class="text-xs text-slate-500 font-bold leading-relaxed"></p>
-            <div class="flex gap-2">
-                <button id="confirm-cancel" class="flex-1 py-3 bg-slate-100 text-slate-400 rounded-xl text-[10px] font-black uppercase tracking-widest">Batal</button>
-                <button id="confirm-ok" class="flex-1 py-3 bg-red-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Hapus</button>
-            </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <div class="admin-contacts">
+        <div class="admin-avatar" onclick="toggleContact('pic1')">
+          <img src="foto1.jpeg" alt="Admin 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="avatar-placeholder" style="display:none;">JK</div>
+          <div class="contact-popup" id="pic1">
+            <div class="contact-name">👤 Joni Kuswanto</div>
+            <button onclick="openWA('628979778571')">📞 Hubungi</button>
+          </div>
         </div>
+        <div class="admin-avatar" onclick="toggleContact('pic2')">
+          <img src="foto2.jpeg" alt="Admin 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="avatar-placeholder" style="display:none;">AS</div>
+          <div class="contact-popup" id="pic2">
+            <div class="contact-name">👤 Akbar Setyawan</div>
+            <button onclick="openWA('628987596408')">📞 Hubungi</button>
+          </div>
+        </div>
+      </div>
+      <button class="sync-btn" onclick="window.location.href='admin.html'">⚙️ Admin Panel</button>
+      <button class="sync-btn" onclick="loadAll()" id="syncBtn">↻ Sync</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tabInput" onclick="switchTab('input')">
+      Input
+      <span class="tab-badge" id="inputBadge"></span>
+    </button>
+    <button class="tab-btn" id="tabTarik" onclick="switchTab('tarik')">
+      Tarik
+      <span class="tab-badge" id="tarikBadge"></span>
+    </button>
+    <button class="tab-btn" id="tabExpToday" onclick="switchTab('expToday')">
+      Exp hari ini
+      <span class="tab-badge" id="expTodayBadge"></span>
+    </button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="panel active" id="panelInput">
+    <div class="form-card" id="formCard">
+      
+      <!-- SEARCH BAR - STICKY DI ATAS (TIDAK IKUT SCROLL) -->
+      <div class="search-sticky">
+        <input class="inp" id="searchProduct" placeholder="🔍 Cari nama barang atau barcode" oninput="searchProductList(this.value)">
+        <div id="searchResults"></div>
+      </div>
+
+      <!-- SCANNER - DIPERKECIL -->
+      <div class="scan-area" onclick="openScanner()" id="scanArea">
+        <span class="scan-area-icon">📷</span>
+        <span class="scan-area-text">Scan Barcode</span>
+        <span class="scan-area-sub">Klik</span>
+      </div>
+
+      <input class="inp" id="fBarcode" placeholder="Barcode (atau scan)" oninput="autoFill(this.value)">
+      <input class="inp" id="fDesc" placeholder="Nama Barang">
+      <input class="inp" id="fExp" type="date">
+      <div class="lokasi-chips" id="lokasiChips"></div>
+      <input class="inp" id="fLokasi" placeholder="Lokasi (Rak/Area)" oninput="updateLokasiChips()">
+      <button class="btn-primary" onclick="submitInput()" id="submitBtn" disabled>💾 Simpan Ke Spreadsheet</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    <div class="section-label">INPUT HARI INI</div>
+    <div id="recentList"></div>
+  </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAf24482S97N82pkopYpj1ZJqdOPiwW9g4",
-            authDomain: "expired-tracker-pro.firebaseapp.com",
-            projectId: "expired-tracker-pro",
-            storageBucket: "expired-tracker-pro.firebasestorage.app",
-            messagingSenderId: "610264736832",
-            appId: "1:610264736832:web:0838a2477519f4dd952ba5"
-        };
+  <div class="panel" id="panelTarik">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;">
+      <div class="section-label" style="margin:0;">List barang yg harus ditarik</div>
+      <div id="pullTotalInfo" style="margin-top:6px; font-size:11px; color:var(--text-2); font-weight:600; white-space:nowrap; min-width:max-content;">Total: 0</div>
+      <input type="date" id="pullDateFilter" class="inp" style="width:auto;margin:0;padding:8px 10px;font-size:12px;" onchange="changePullDate(this.value)">
+    </div>
+    <div id="pullList"></div>
+  </div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+  <!-- PANEL BARU: EXPIRED HARI INI -->
+  <div class="panel" id="panelExpToday">
+    <div class="section-label">📅 BARANG YANG EXPIRED HARI INI</div>
+    <div id="expTodayList"></div>
+  </div>
+</div>
 
-        let masterProducts = [];
-        let inventoryData = [];
-        let currentQuickFilter = 'all';
-        let historyDateFilter = '';
-        const ADMIN_PIN = "123456";
+<script>
+const PROXY_URL = "/api/proxy"; 
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAUZU8sXxjAfd8_pWPR0fybYWp2yxIBgvIR57ml25i5bDDDDHvk2ENIfsAw0lgrWMv/exec";
+const API_TOKEN = "RAHASIA_123"; 
 
-        const showNotif = (msg, type = 'blue') => {
-            const box = document.getElementById('notif-box');
-            const colors = { emerald: 'bg-emerald-500', red: 'bg-red-500', blue: 'bg-blue-600' };
-            box.className = `${colors[type]} fixed bottom-24 left-6 right-6 p-4 rounded-2xl shadow-2xl z-[150] text-white font-bold text-xs text-center`;
-            box.innerText = msg;
-            box.classList.remove('hide');
-            setTimeout(() => box.classList.add('hide'), 3000);
-        };
-        
-        const customConfirm = (msg) => {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('confirm-modal');
-                const message = document.getElementById('confirm-message');
-                const okBtn = document.getElementById('confirm-ok');
-                const cancelBtn = document.getElementById('confirm-cancel');
-                
-                message.innerText = msg;
-                modal.classList.remove('hidden');
-                
-                const cleanup = (val) => {
-                    modal.classList.add('hidden');
-                    okBtn.onclick = null;
-                    cancelBtn.onclick = null;
-                    resolve(val);
-                };
-                
-                okBtn.onclick = () => cleanup(true);
-                cancelBtn.onclick = () => cleanup(false);
-            });
-        };
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+let dbItems = [];
+let inItems = [];
+let checkedRows = new Set();
+let selectedPullDate = getTodayStr();
+let html5QrScanner = null;
+let lokasiFrecuentes = [];
+let barcodeNotFoundShown = false;
+let databaseData = [];
+let toastTimer = null;
+let isOnline = navigator.onLine;
+let offlineQueue = [];
 
-        const verifyPin = () => {
-            const pin = prompt("Masukkan PIN Admin");
-            if (!pin) return false;
-            if (pin === ADMIN_PIN) {
-                return true;
-            } else {
-                showNotif("PIN SALAH", "red");
-                return false;
-            }
-        };
+function getTodayStr() {
+  const now = new Date();
+  const jakarta = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const year = jakarta.getFullYear();
+  const month = String(jakarta.getMonth() + 1).padStart(2, '0');
+  const day = String(jakarta.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
-        const formatTanggalID = (dateStr) => {
-            if (!dateStr) return '---';
-            const d = new Date(dateStr);
-            const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-            const tgl = String(d.getDate()).padStart(2, '0');
-            const bln = bulan[d.getMonth()];
-            const thn = d.getFullYear();
-            return `${tgl} ${bln} ${thn}`;
-        };
+function getExpRaw(obj) {
+  if (!obj) return null;
+  const exact = ['Expired Date', 'expiredDate', 'expired_date', 'expDate', 'exp_date', 'tanggal_expired', 'Tanggal Expired'];
+  for (let k of exact) if (obj[k]) return obj[k];
+  let possibleDate = null;
+  for (let key in obj) {
+    let k = String(key).toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (k.includes('exp') || k.includes('kadal')) if (obj[key]) return obj[key];
+    if (!possibleDate && (k.includes('date') || k.includes('tgl') || k.includes('tanggal')) && !k.includes('timestamp') && !k.includes('input')) if (obj[key]) possibleDate = obj[key];
+  }
+  if (possibleDate) return possibleDate;
+  let fallbackDates = [];
+  for (let key in obj) {
+    let val = String(obj[key]).trim();
+    if (val.length < 5 || val.length > 30) continue;
+    if (/^\d+$/.test(val) && val.length > 10) continue;
+    if (/^\d{4}[\/\-]\d{2}[\/\-]\d{2}/.test(val) || /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}/.test(val) || (/^\d{5}$/.test(val) && parseInt(val) > 30000)) fallbackDates.push(val);
+  }
+  return fallbackDates.length > 0 ? (fallbackDates.find(v => !v.includes(':')) || fallbackDates[0]) : null;
+}
 
-        onSnapshot(query(collection(db, "master_products"), orderBy("sku")), (snap) => {
-            masterProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            document.getElementById('master-count').innerText = `${masterProducts.length} SKU Terdaftar`;
-            renderMasterList();
-        });
+function parseToISO(raw) {
+  if (!raw) return null;
+  if (raw instanceof Date) return raw.toISOString().split('T')[0];
+  let s = String(raw).trim();
+  if (/^\d{5}$/.test(s) && parseInt(s) > 30000) {
+    let d = new Date((parseInt(s) - 25569) * 86400000);
+    return d.toISOString().split('T')[0];
+  }
+  let iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) return `${iso[1]}-${iso[2].padStart(2,'0')}-${iso[3].padStart(2,'0')}`;
+  let us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (us) {
+    let a = parseInt(us[1]), b = parseInt(us[2]);
+    if (a > 12) return `${us[3]}-${String(b).padStart(2,'0')}-${String(a).padStart(2,'0')}`;
+    return `${us[3]}-${String(a).padStart(2,'0')}-${String(b).padStart(2,'0')}`;
+  }
+  let d = new Date(s);
+  if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+  return null;
+}
 
-        onSnapshot(query(collection(db, "inventory_expired"), orderBy("createdAt", "desc")), (snap) => {
-            inventoryData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            
-            if (inventoryData.length > 0) {
-                const latest = inventoryData[0];
-                let dateStr = "---";
-                let timeStr = "---";
-                const ts = latest.createdAt || latest.updatedAt;
-                if (ts && ts.toDate) {
-                    const d = ts.toDate();
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const month = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][d.getMonth()];
-                    const year = d.getFullYear();
-                    dateStr = `${day} ${month} ${year}`;
-                    const h = String(d.getHours()).padStart(2, '0');
-                    const m = String(d.getMinutes()).padStart(2, '0');
-                    const s = String(d.getSeconds()).padStart(2, '0');
-                    timeStr = `${h}:${m}:${s}`;
-                }
-                document.getElementById('header-last-date').innerText = `Terakhir diinput : ${dateStr}`;
-                document.getElementById('header-last-pic').innerText = `Oleh : ${latest.pic || '---'}`;
-                document.getElementById('header-last-time').innerText = `Waktu : ${timeStr}`;
-            }
+function daysDiff(rawA, rawB) {
+  const isoA = parseToISO(rawA), isoB = parseToISO(rawB);
+  if (!isoA || !isoB) return 0;
+  const [y1,m1,d1] = isoA.split('-').map(Number), [y2,m2,d2] = isoB.split('-').map(Number);
+  return Math.round((new Date(y1,m1-1,d1) - new Date(y2,m2-1,d2)) / 86400000);
+}
 
-            updateStats();
-            renderInventoryList();
-            renderArchiveList();
-        });
+function isBarcodeRegistered(barcode) {
+  return databaseData.some(item => String(item.barcode).trim() === String(barcode).trim());
+}
 
-        window.filterToday = () => {
-            const today = new Date().toISOString().split('T')[0];
-            historyDateFilter = today;
-            document.getElementById('history-date-filter').value = today;
-            renderInventoryList(document.getElementById('history-search')?.value || '');
-        };
+function loadCache() {
+  try {
+    const dbRaw = localStorage.getItem('cache_db'), inRaw = localStorage.getItem('cache_in'), chkRaw = localStorage.getItem('cache_checked');
+    const now = Date.now();
+    dbItems = (dbRaw && (now - parseInt(localStorage.getItem('cache_db_ts') || '0')) < CACHE_TTL_MS) ? JSON.parse(dbRaw) : [];
+    inItems = (inRaw && (now - parseInt(localStorage.getItem('cache_in_ts') || '0')) < CACHE_TTL_MS) ? JSON.parse(inRaw) : [];
+    checkedRows = new Set(chkRaw ? JSON.parse(chkRaw) : []);
+    const queueRaw = localStorage.getItem('offline_queue');
+    if (queueRaw) offlineQueue = JSON.parse(queueRaw);
+  } catch(e) { dbItems = []; inItems = []; checkedRows = new Set(); offlineQueue = []; }
+}
 
-        window.filterByDate = (date) => {
-            historyDateFilter = date;
-            renderInventoryList(document.getElementById('history-search')?.value || '');
-        };
+function saveCache(key, data) { localStorage.setItem(key, JSON.stringify(data)); localStorage.setItem(key + '_ts', Date.now().toString()); }
+function saveOfflineQueue() { localStorage.setItem('offline_queue', JSON.stringify(offlineQueue)); }
 
-        window.setQuickFilter = (filter) => {
-            currentQuickFilter = filter;
-            document.querySelectorAll('.quick-filter-btn').forEach(btn => btn.classList.remove('active-filter'));
-            event.target.classList.add('active-filter');
-            renderDashboardQuickList();
-        };
+async function callApi(params, body = null) {
+  if (!isOnline) {
+    if (body && params.action === "addInput") {
+      offlineQueue.push({ params, body, timestamp: Date.now() });
+      saveOfflineQueue();
+      showToast("📡 Mode Offline - Data akan disimpan saat online", "warning");
+      return { rowIndex: Date.now(), offline: true };
+    }
+    throw new Error("Tidak ada koneksi internet");
+  }
+  try {
+    const res = await fetch(PROXY_URL + "?" + new URLSearchParams(params), { method: body ? 'POST' : 'GET', headers: {'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : null });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    return json;
+  } catch(e) {
+    params.token = API_TOKEN;
+    const res = await fetch(APPS_SCRIPT_URL + "?" + new URLSearchParams(params), { method: body ? 'POST' : 'GET', body: body ? JSON.stringify({...body, token:API_TOKEN}) : null });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    return json;
+  }
+}
 
-        window.switchTab = (tab) => {
-            const views = ['dashboard', 'input', 'history', 'archive', 'master'];
-            views.forEach(v => document.getElementById(`view-${v}`).classList.add('hide'));
-            document.getElementById(`view-${tab}`).classList.remove('hide');
-            const navs = ['dashboard', 'input', 'history', 'archive'];
-            navs.forEach(n => {
-                const btn = document.getElementById(`nav-${n}`);
-                const tabBtn = document.getElementById(`btn-${n}`);
-                if (btn) btn.className = n === tab ? 'p-2 text-blue-600 scale-110' : 'p-2 text-slate-300';
-                if (tabBtn) tabBtn.className = n === tab ? 'flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-active' : 'flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all tab-inactive';
-            });
-            lucide.createIcons();
-        };
+async function syncOfflineQueue() {
+  if (!isOnline || offlineQueue.length === 0) return;
+  showToast(`🔄 Sinkronisasi ${offlineQueue.length} data offline...`, "info");
+  for (let i = 0; i < offlineQueue.length; i++) {
+    const item = offlineQueue[i];
+    try { await callApi(item.params, item.body); } catch(e) { console.error(e); }
+  }
+  offlineQueue = [];
+  saveOfflineQueue();
+  await loadAll();
+  showToast("✅ Semua data offline berhasil disinkronkan", "success");
+}
 
-        window.handleMasterSearch = (val) => {
-            const dropdown = document.getElementById('search-dropdown');
-            if (val.length < 2) { dropdown.classList.add('hide'); return; }
-            const filtered = masterProducts.filter(p => p.sku?.toLowerCase().includes(val.toLowerCase()) || p.itemDescription?.toLowerCase().includes(val.toLowerCase())).slice(0, 10);
-            dropdown.innerHTML = filtered.map(p => `
-                <div onclick="selectProduct('${p.sku}', '${p.itemDescription.replace(/'/g, "\\'")}')" class="p-4 border-b border-slate-50 hover:bg-blue-50 cursor-pointer flex flex-col">
-                    <span class="font-black text-blue-700 text-sm">${p.sku}</span>
-                    <span class="text-xs text-slate-500 font-bold truncate">${p.itemDescription}</span>
-                </div>
-            `).join('');
-            dropdown.classList.remove('hide');
-        };
+function updateTabBadges() {
+  const today = getTodayStr();
+  const todayInputs = inItems.filter(i => (i.timestamp || "").startsWith(today)).length;
+  const inputBadge = document.getElementById('inputBadge');
+  if (todayInputs > 0) {
+    inputBadge.innerText = todayInputs > 99 ? '99+' : todayInputs;
+    inputBadge.classList.add('show');
+  } else { inputBadge.classList.remove('show'); }
+  
+  const pullList = inItems.map(i => {
+    const db = dbItems.find(x => x.barcode === i.barcode), hMin = db ? (db.hMinus || 0) : 0;
+    const rawExp = getExpRaw(i) || i.expiredDate;
+    const isoExp = parseToISO(rawExp);
+    if (!isoExp) return false;
+    const pullDate = new Date(isoExp);
+    pullDate.setDate(pullDate.getDate() - (hMin - 1));
+    const filterDate = selectedPullDate || getTodayStr();
+    const todayDate = new Date(filterDate);
+    return pullDate.getFullYear() === todayDate.getFullYear() && pullDate.getMonth() === todayDate.getMonth() && pullDate.getDate() === todayDate.getDate();
+  }).filter(Boolean).length;
+  
+  const tarikBadge = document.getElementById('tarikBadge');
+  if (pullList > 0) {
+    tarikBadge.innerText = pullList > 99 ? '99+' : pullList;
+    tarikBadge.classList.add('show');
+  } else { tarikBadge.classList.remove('show'); }
 
-        window.selectProduct = (sku, desc) => {
-            document.getElementById('form-sku').value = sku;
-            document.getElementById('form-desc').value = desc;
-            document.getElementById('display-sku').innerText = sku;
-            document.getElementById('display-desc').innerText = desc;
-            document.getElementById('search-dropdown').classList.add('hide');
-            document.getElementById('master-search-input').value = '';
-            document.getElementById('expiry-form').classList.remove('opacity-40', 'pointer-events-none');
-            showNotif("PRODUK DIPILIH", "blue");
-        };
+  // Badge untuk tab Exp hari ini
+  const expiredTodayCount = inItems.filter(i => {
+    const rawExp = getExpRaw(i) || i.expiredDate;
+    const isoExp = parseToISO(rawExp);
+    if (!isoExp) return false;
+    return isoExp === today;
+  }).length;
+  
+  const expTodayBadge = document.getElementById('expTodayBadge');
+  if (expiredTodayCount > 0) {
+    expTodayBadge.innerText = expiredTodayCount > 99 ? '99+' : expiredTodayCount;
+    expTodayBadge.classList.add('show');
+  } else { expTodayBadge.classList.remove('show'); }
+}
 
-        document.getElementById('expiry-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save');
-            const id = document.getElementById('form-id').value;
-            btn.innerText = "MEMPROSES...";
-            const payload = {
-                sku: document.getElementById('form-sku').value,
-                itemDescription: document.getElementById('form-desc').value,
-                qty: parseInt(document.getElementById('form-qty').value),
-                pic: document.getElementById('form-pic').value.toUpperCase(),
-                expiredDate: document.getElementById('form-date').value,
-                updatedAt: serverTimestamp()
-            };
-            try {
-                if (id) {
-                    await updateDoc(doc(db, "inventory_expired", id), payload);
-                    showNotif("Data diperbarui!", "emerald");
-                } else {
-                    await addDoc(collection(db, "inventory_expired"), { ...payload, createdAt: serverTimestamp(), notificationFlags: {} });
-                    showNotif("Data disimpan!", "blue");
-                }
-                resetForm();
-                switchTab('history');
-            } catch (err) { showNotif("Gagal simpan", "red"); } finally { btn.innerText = id ? "UPDATE DATA" : "SIMPAN DATA"; }
-        };
+function renderExpTodayList() {
+  const container = document.getElementById('expTodayList');
+  const today = getTodayStr();
+  
+  // Filter item yang expired date-nya sama dengan hari ini
+  const expiredToday = inItems.filter(i => {
+    const rawExp = getExpRaw(i) || i.expiredDate;
+    const isoExp = parseToISO(rawExp);
+    if (!isoExp) return false;
+    return isoExp === today;
+  });
+  
+  if (expiredToday.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div>Tidak ada barang yang expired hari ini</div>`;
+    return;
+  }
+  
+  container.innerHTML = expiredToday.map(i => {
+    const registered = isBarcodeRegistered(i.barcode);
+    const notRegisteredClass = !registered ? 'not-registered' : '';
+    const offlineBadge = i.offline ? '<span style="background:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:6px;">📡 Offline</span>' : '';
+    const rawExp = getExpRaw(i) || i.expiredDate;
+    
+    return `<div class="expired-card ${notRegisteredClass}">
+      <div class="pull-card-top">
+        <div style="flex:1">
+          <div class="expired-name">
+            ${escHtml(i.description || i.barcode)}${offlineBadge}
+            <span class="expired-badge">EXPIRED HARI INI</span>
+          </div>
+          <div class="expired-meta">
+            ${escHtml(i.barcode)} · Exp: ${formatDateIndo(rawExp)} · Lokasi: ${escHtml(i.lokasi || '-')}
+          </div>
+          ${!registered ? `<div class="not-registered-badge">⚠️ Belum Terdaftar di Database Master</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-        window.resetForm = () => {
-            document.getElementById('expiry-form').reset();
-            document.getElementById('form-id').value = '';
-            document.getElementById('display-sku').innerText = '---';
-            document.getElementById('display-desc').innerText = 'Menunggu pilihan produk';
-            document.getElementById('expiry-form').classList.add('opacity-40', 'pointer-events-none');
-            document.getElementById('btn-cancel').classList.add('hide');
-            document.getElementById('btn-save').innerText = 'SIMPAN DATA';
-        };
+function initOfflineDetection() {
+  window.addEventListener('online', async () => {
+    isOnline = true;
+    const indicator = document.getElementById('onlineIndicator');
+    indicator.classList.add('show');
+    setTimeout(() => indicator.classList.remove('show'), 3000);
+    await syncOfflineQueue();
+    await loadAll();
+  });
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    const indicator = document.getElementById('offlineIndicator');
+    indicator.classList.add('show');
+    setTimeout(() => indicator.classList.remove('show'), 3000);
+    showToast("📡 Mode Offline - Data akan disimpan sementara", "warning");
+  });
+}
 
-        const updateStats = () => {
-            const today = new Date().setHours(0,0,0,0);
-            const stats = { total: inventoryData.length, expired: 0, h7: 0, h30: 0, h90: 0 };
-            inventoryData.forEach(item => {
-                const expDate = new Date(item.expiredDate);
-                expDate.setHours(0,0,0,0);
+async function loadAll() {
+  if (!isOnline) {
+    showToast("📡 Mode Offline - Menampilkan data dari cache", "warning");
+    renderRecent(); renderPullList(); renderExpTodayList(); buildLokasiHistory(); updateTabBadges();
+    return;
+  }
+  const syncBtn = document.getElementById('syncBtn');
+  syncBtn.innerText = "Sync..."; syncBtn.disabled = true;
+  try {
+    const [dbRes, inRes] = await Promise.all([callApi({action:"getDatabase"}), callApi({action:"getInputs"})]);
+    dbItems = dbRes.data;
+    databaseData = dbRes.data || [];
+    inItems = inRes.data;
+    saveCache('cache_db', dbItems); saveCache('cache_in', inItems);
+    renderRecent(); renderPullList(); renderExpTodayList(); buildLokasiHistory(); updateTabBadges();
+    showToast("Data diperbarui ✓", "success");
+  } catch(e) { showToast("Gagal sync: " + e.message, "error"); }
+  syncBtn.innerText = "↻ Sync"; syncBtn.disabled = false;
+}
 
-                const diff = Math.floor((expDate - today) / 86400000);
-                if (diff <= 0) stats.expired++;
-                else if (diff <= 7) stats.h7++;
-                else if (diff <= 30) stats.h30++;
-                else if (diff <= 90) stats.h90++;
-            });
-            document.getElementById('stat-total').innerText = stats.total;
-            document.getElementById('stat-expired').innerText = stats.expired;
-            document.getElementById('stat-h7').innerText = stats.h7;
-            document.getElementById('stat-h30').innerText = stats.h30;
-            document.getElementById('stat-h90').innerText = stats.h90;
-            renderDashboardQuickList();
-        };
+async function submitInput() {
+  const b = document.getElementById('fBarcode').value.trim();
+  const d = document.getElementById('fDesc').value.trim();
+  const e = document.getElementById('fExp').value;
+  const l = document.getElementById('fLokasi').value.trim();
+  const today = getTodayStr();
 
-        const renderDashboardQuickList = () => {
-            const list = document.getElementById('dashboard-quick-list');
-            const today = new Date().setHours(0,0,0,0);
-            let filtered = [...inventoryData];
+  const duplicate = inItems.find(item => (item.timestamp || '').startsWith(today) && item.barcode === b && parseToISO(item.expiredDate) === e && (item.lokasi || '').toLowerCase() === l.toLowerCase());
+  if (duplicate) {
+    const lanjut = confirm("⚠️ Data serupa sudah pernah diinput hari ini.\n\n" + d + "\nExp: " + formatDateIndo(e) + "\nLokasi: " + l + "\n\nLanjut simpan?");
+    if (!lanjut) return;
+  }
 
-            if (currentQuickFilter === 'expired') {
-                filtered = filtered.filter(item => {
-                    const expDate = new Date(item.expiredDate);
-                    expDate.setHours(0,0,0,0);
-                    return Math.floor((expDate - today) / 86400000) <= 0;
-                });
-            } else if (currentQuickFilter !== 'all') {
-                filtered = filtered.filter(item => {
-                    const expDate = new Date(item.expiredDate);
-                    expDate.setHours(0,0,0,0);
-                    const diff = Math.floor((expDate - today) / 86400000);
-                    return diff > 0 && diff <= parseInt(currentQuickFilter);
-                });
-            }
+  const found = dbItems.find(x => x.barcode === b);
+  if (!found) return showToast("⚠️ Barcode tidak ditemukan. Hubungi Admin.", "error");
+  if (!b || !d || !e || !l) return showToast("Semua field wajib diisi!", "error");
 
-            const sorted = filtered.sort((a, b) => new Date(a.expiredDate) - new Date(b.expiredDate)).slice(0, 3);
-            if (sorted.length === 0) {
-                list.innerHTML = `<div class="text-center py-8 bg-white/40 rounded-[2rem] border border-dashed border-slate-200"><p class="text-[10px] font-bold text-slate-400 uppercase">Tidak ada data</p></div>`;
-                return;
-            }
-            list.innerHTML = sorted.map(item => {
-                const expDate = new Date(item.expiredDate);
-                expDate.setHours(0,0,0,0);
-                const diff = Math.floor((expDate - today) / 86400000);
-                let badge = `<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">${diff} Hari</span>`;
-                if (diff <= 0) badge = `<span class="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase">EXPIRED</span>`;
-                else if (diff <= 7) badge = `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">BAHAYA</span>`;
-                else if (diff <= 30) badge = `<span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[9px] font-black uppercase">WASPADA</span>`;
-                return `<div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between"><div class="flex-1 overflow-hidden pr-2"><div class="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">${item.sku}</div><div class="text-xs font-extrabold text-slate-800 truncate">${item.itemDescription}</div></div><div class="flex items-center gap-2">${badge}<div class="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-xl text-slate-300" onclick="editEntry('${item.id}')"><i data-lucide="chevron-right" class="w-4 h-4"></i></div></div></div>`;
-            }).join('');
-            lucide.createIcons();
-        };
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.innerText = "Menyimpan...";
+  try {
+    const res = await callApi({ action:"addInput" }, { barcode: b, description: d, expiredDate: e, lokasi: l });
+    if (res.offline) {
+      inItems.push({ rowIndex: res.rowIndex, barcode: b, description: d, expiredDate: e, lokasi: l, timestamp: getTodayStr(), offline: true });
+      saveCache('cache_in', inItems);
+      showToast("📡 Disimpan offline - Akan sync otomatis", "warning");
+    } else {
+      inItems.push({ rowIndex: res.rowIndex, barcode: b, description: d, expiredDate: e, lokasi: l, timestamp: getTodayStr() });
+      saveCache('cache_in', inItems);
+      showToast("Berhasil disimpan ✓", "success");
+    }
+    renderRecent(); renderPullList(); renderExpTodayList(); updateTabBadges();
+    document.getElementById('fBarcode').value = ""; document.getElementById('fDesc').value = ""; document.getElementById('fExp').value = ""; document.getElementById('fLokasi').value = ""; document.getElementById('searchProduct').value = ""; document.getElementById('searchResults').innerHTML = "";
+    document.getElementById('submitBtn').disabled = true;
+    barcodeNotFoundShown = false;
+  } catch(x) { showToast("Gagal simpan: " + x.message, "error"); }
+  btn.disabled = false; btn.innerText = "💾 Simpan Ke Spreadsheet";
+}
 
-        window.renderArchiveList = () => {
-            const list = document.getElementById('archive-list');
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            
-            const filtered = inventoryData.filter(item => {
-                const expDate = new Date(item.expiredDate + 'T23:59:59');
-                const diff = Math.floor(
-                    (expDate - today) / 86400000
-                );
-                return diff < 0;
-            });
+function formatDateIndo(raw) {
+  const iso = parseToISO(raw);
+  if (!iso) return '-';
+  const [y,m,d] = iso.split('-').map(Number);
+  return `${d} ${["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"][m-1]} ${y}`;
+}
 
-            if(filtered.length === 0){
-                list.innerHTML = `
-                    <div class="text-center py-10 text-slate-300 font-bold text-xs">
-                        TIDAK ADA ARSIP
-                    </div>
-                `;
-                return;
-            }
+function renderRecent() {
+  const container = document.getElementById('recentList');
+  const today = getTodayStr();
+  const filtered = inItems.filter(i => (i.timestamp || "").startsWith(today)).reverse();
+  if (!filtered.length) { container.innerHTML = `<div class="empty-state">Belum ada input hari ini</div>`; return; }
+  container.innerHTML = filtered.map(i => {
+    const registered = isBarcodeRegistered(i.barcode);
+    const notRegisteredClass = !registered ? 'not-registered' : '';
+    const offlineBadge = i.offline ? '<span style="background:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:6px;">📡 Offline</span>' : '';
+    return `<div class="recent-item ${notRegisteredClass}"><div class="ri-info"><div class="ri-name">${escHtml(i.description || i.barcode)}${offlineBadge}</div><div class="ri-meta">${escHtml(i.barcode)} · Exp: ${formatDateIndo(getExpRaw(i))}</div>${!registered ? `<div class="not-registered-badge">⚠️ Belum Terdaftar di Database Master</div>` : ''}</div></div>`;
+  }).join('');
+  updateTabBadges();
+}
 
-            list.innerHTML = filtered.map(item => `
-                <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <div class="text-[10px] font-extrabold text-red-500 uppercase mb-1">
-                        ${item.sku}
-                    </div>
-                    <div class="text-sm font-black text-slate-800">
-                        ${item.itemDescription}
-                    </div>
-                    <div class="mt-3 text-[10px] font-bold text-slate-400">
-                        Expired:
-                        ${formatTanggalID(item.expiredDate)}
-                    </div>
-                </div>
-            `).join('');
-        };
+function renderPullList() {
+  const container = document.getElementById('pullList');
+  const today = getTodayStr();
+  const list = inItems.map(i => {
+    const db = dbItems.find(x => x.barcode === i.barcode), hMin = db ? (db.hMinus || 0) : 0;
+    const rawExp = getExpRaw(i) || i.expiredDate;
+    const isoExp = parseToISO(rawExp); 
+    if (!isoExp) return {...i, isTodayPull: false}; 
+    const daysUntilExp = daysDiff(isoExp, today) + 1;
+    const daysUntilPull = daysUntilExp - (hMin - 1);
+    let status = (daysUntilPull <= 0) ? 'red' : (daysUntilPull <= 3) ? 'amber' : 'green';
+    const pullDate = new Date(isoExp);
+    pullDate.setDate(pullDate.getDate() - (hMin - 1));
+    const filterDate = selectedPullDate || getTodayStr();
+    const todayDate = new Date(filterDate);
+    const isTodayPull = pullDate.getFullYear() === todayDate.getFullYear() && pullDate.getMonth() === todayDate.getMonth() && pullDate.getDate() === todayDate.getDate();
+    return { ...i, isoExp, status, daysUntilExp, isTodayPull };
+  }).sort((a, b) => (a.daysUntilExp || 9999) - (b.daysUntilExp || 9999));
+  const filtered = list.filter(i => i.isTodayPull);
+  document.getElementById('pullTotalInfo').innerText = `Total: ${filtered.length}`;
+  if (!filtered.length) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div>Tidak ada barang yg wajib ditarik di tanggal ini</div>`; updateTabBadges(); return; }
+  container.innerHTML = filtered.map(i => {
+    const registered = isBarcodeRegistered(i.barcode);
+    const notRegisteredClass = !registered ? 'not-registered' : '';
+    const offlineBadge = i.offline ? '<span style="background:#d97706; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:6px;">📡 Offline</span>' : '';
+    return `<div class="pull-card ${i.status} ${checkedRows.has(i.rowIndex) ? 'done' : ''} ${notRegisteredClass}"><div class="pull-card-top"><div style="flex:1"><div class="pull-name">${escHtml(i.description || i.barcode)}${offlineBadge}</div><div class="pull-meta">Exp: ${formatDateIndo(i.isoExp)} (${i.daysUntilExp} hari menuju expired)</div>${!registered ? `<div class="not-registered-badge">⚠️ Belum Terdaftar di Database Master</div>` : ''}</div><div class="check-box ${checkedRows.has(i.rowIndex) ? 'checked' : ''}" onclick="toggleCheck(${i.rowIndex})">${checkedRows.has(i.rowIndex) ? '✔️' : ''}</div></div></div>`;
+  }).join('');
+  updateTabBadges();
+}
 
-        window.renderInventoryList = (search = '') => {
-            const list = document.getElementById('inventory-list');
-            const today = new Date().setHours(0,0,0,0);
-            let filtered = search ? inventoryData.filter(item => item.sku?.toLowerCase().includes(search.toLowerCase()) || item.itemDescription?.toLowerCase().includes(search.toLowerCase()) || item.pic?.toLowerCase().includes(search.toLowerCase())) : [...inventoryData];
-            
-            filtered = filtered.filter(item => {
-                const expDate = new Date(item.expiredDate + 'T23:59:59');
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                const diff = Math.floor(
-                    (expDate - today) / 86400000
-                );
-                return diff >= 0;
-            });
+function toggleCheck(idx) {
+  if (checkedRows.has(idx)) checkedRows.delete(idx); else checkedRows.add(idx);
+  localStorage.setItem('cache_checked', JSON.stringify([...checkedRows]));
+  renderPullList();
+}
 
-            if (historyDateFilter) {
-                filtered = filtered.filter(item => {
-                    const ts = item.createdAt || item.updatedAt;
-                    if (!ts || !ts.toDate) return false;
-                    const d = ts.toDate();
-                    return (d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')) === historyDateFilter;
-                });
-            }
-            list.innerHTML = filtered.map(item => {
-                const expDate = new Date(item.expiredDate);
-                expDate.setHours(0,0,0,0);
-                const diff = Math.floor((expDate - today) / 86400000);
-                let colorClass = 'bg-blue-500';
-                let tagClass = 'bg-blue-50 text-blue-600';
-                if (diff <= 0) { colorClass = 'bg-slate-900'; tagClass='bg-slate-100 text-slate-800'; }
-                else if (diff <= 7) { colorClass = 'bg-red-500'; tagClass='bg-red-600 text-white shadow-sm'; }
-                else if (diff <= 30) { colorClass = 'bg-orange-500'; tagClass='bg-orange-50 text-orange-600'; }
-                return `
-                    <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col gap-4 relative overflow-hidden group">
-                        <div class="absolute top-0 left-0 w-2 h-full ${colorClass}"></div>
-                        <div class="flex justify-between items-start pl-3">
-                            <div class="flex-1 overflow-hidden pr-4">
-                                <div class="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest leading-none mb-1.5">${item.sku}</div>
-                                <div class="text-md font-extrabold text-slate-800 leading-tight">${item.itemDescription}</div>
-                            </div>
-                            <div class="bg-slate-50 px-4 py-2 rounded-2xl font-extrabold text-[10px] border border-slate-100">QTY: ${item.qty}</div>
-                        </div>
-                        <div class="flex justify-between items-center pt-4 border-t border-slate-50 pl-3">
-                            <div class="flex flex-col gap-1">
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide ${tagClass}">
-                                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${formatTanggalID(item.expiredDate)}
-                                </div>
-                                <div class="text-[9px] font-bold text-slate-400 uppercase mt-1 pl-1">ID: ${item.pic}</div>
-                            </div>
-                            <div class="flex gap-1">
-                                <button onclick="editEntry('${item.id}')" class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 rounded-2xl active:bg-blue-50 transition-all"><i data-lucide="edit-3" class="w-4.5 h-4.5"></i></button>
-                                <button onclick="deleteEntry('${item.id}')" class="p-3 bg-slate-50 text-slate-300 hover:text-red-500 rounded-2xl active:bg-red-50 transition-all"><i data-lucide="trash-2" class="w-4.5 h-4.5"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        };
+function buildLokasiHistory() {
+  const freq = {}; inItems.forEach(i => { if (i.lokasi) freq[i.lokasi] = (freq[i.lokasi] || 0) + 1; });
+  lokasiFrecuentes = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,5).map(e => e[0]);
+  renderLokasiChips('');
+}
 
-        window.editEntry = (id) => {
-            if (!verifyPin()) return;
-            const item = inventoryData.find(i => i.id === id); if (!item) return;
-            switchTab('input');
-            document.getElementById('form-id').value = item.id;
-            document.getElementById('form-sku').value = item.sku;
-            document.getElementById('form-desc').value = item.itemDescription;
-            document.getElementById('form-qty').value = item.qty;
-            document.getElementById('form-pic').value = item.pic;
-            document.getElementById('form-date').value = item.expiredDate;
-            document.getElementById('display-sku').innerText = item.sku;
-            document.getElementById('display-desc').innerText = item.itemDescription;
-            document.getElementById('expiry-form').classList.remove('opacity-40', 'pointer-events-none');
-            document.getElementById('btn-cancel').classList.remove('hide');
-            document.getElementById('btn-save').innerText = 'UPDATE DATA';
-        };
+function renderLokasiChips(val) {
+  const container = document.getElementById('lokasiChips');
+  const s = lokasiFrecuentes.filter(l => !val || l.toLowerCase().includes(val.toLowerCase()));
+  container.innerHTML = s.map(l => `<button class="lokasi-chip" onclick="pickLokasi('${l.replace(/'/g, "\\'")}')">${escHtml(l)}</button>`).join('');
+}
 
-        window.deleteEntry = async (id) => {
-            if (!verifyPin()) return;
-            const confirmed = await customConfirm("Apakah Anda yakin ingin menghapus data inventory ini?");
-            if(!confirmed) return;
-            try { await deleteDoc(doc(db, "inventory_expired", id)); showNotif("DATA DIHAPUS", "red"); } catch (e) { showNotif("GAGAL HAPUS", "red"); }
-        };
+function updateLokasiChips() { renderLokasiChips(document.getElementById('fLokasi').value); }
+function pickLokasi(val) { document.getElementById('fLokasi').value = val; renderLokasiChips(''); }
 
-        window.renderMasterList = (search = '') => {
-            const list = document.getElementById('master-list');
-            const filtered = search ? masterProducts.filter(p => p.sku.toLowerCase().includes(search.toLowerCase()) || p.itemDescription.toLowerCase().includes(search.toLowerCase())) : masterProducts.slice(0, 50);
-            if(filtered.length === 0) { list.innerHTML = `<div class="text-center py-10 text-slate-300 font-bold text-xs">KOSONG</div>`; return; }
-            list.innerHTML = filtered.map((p, idx) => `
-                <div class="bg-white p-5 rounded-[2rem] border border-slate-100 flex items-center justify-between shadow-sm group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-[11px] font-extrabold text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-400 transition-all">${idx+1}</div>
-                        <div class="overflow-hidden">
-                            <div class="text-[10px] font-extrabold text-blue-600 uppercase leading-none mb-1 tracking-tight">${p.sku}</div>
-                            <div class="text-xs font-bold text-slate-800 truncate w-44">${p.itemDescription}</div>
-                        </div>
-                    </div>
-                    <button onclick="deleteMaster('${p.id}')" class="p-3 text-slate-200 hover:text-red-400 transition-all"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        };
+function openScanner() {
+  document.getElementById('scannerOverlay').classList.add('open');
+  html5QrScanner = new Html5Qrcode("html5-qrcode-container");
+  html5QrScanner.start({facingMode: "environment"}, {fps: 30, qrbox: 240}, (t) => { closeScanner(); document.getElementById('fBarcode').value = t; autoFill(t); showToast("Barcode terbaca"); });
+}
 
-        window.deleteMaster = async (id) => {
-            if (!verifyPin()) return;
-            const confirmed = await customConfirm("Hapus SKU ini dari Master?");
-            if(!confirmed) return;
-            try { await deleteDoc(doc(db, "master_products", id)); showNotif("SKU DIHAPUS", "red"); } catch (e) { showNotif("GAGAL", "red"); }
-        };
+function closeScanner() { document.getElementById('scannerOverlay').classList.remove('open'); if(html5QrScanner) html5QrScanner.stop(); }
 
-        window.handleCSV = (e) => {
-            if (!verifyPin()) { e.target.value = ''; return; }
-            const file = e.target.files[0];
-            const btn = document.getElementById('btn-csv');
-            if (!file) return;
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: async (results) => {
-                    const data = results.data;
-                    btn.disabled = true;
-                    btn.innerText = "...";
-                    try {
-                        const chunks = [];
-                        for (let i = 0; i < data.length; i += 400) { chunks.push(data.slice(i, i + 400)); }
-                        for (const chunk of chunks) {
-                            const batch = writeBatch(db);
-                            chunk.forEach(row => {
-                                const skuKey = Object.keys(row).find(k => k.toLowerCase().includes('sku'));
-                                const descKey = Object.keys(row).find(k => k.toLowerCase().includes('desc') || k.toLowerCase().includes('item'));
-                                if (row[skuKey] && row[descKey]) {
-                                    const sku = row[skuKey].toString().trim().toUpperCase();
-                                    if (!sku || !row[descKey]) return;
-                                    const newDoc = doc(db, "master_products", sku);
-                                    batch.set(newDoc, { sku: sku, itemDescription: row[descKey].toString().trim(), createdAt: serverTimestamp() });
-                                }
-                            });
-                            await batch.commit();
-                        }
-                        showNotif(`SUKSES IMPORT`, "emerald");
-                    } catch (err) { showNotif("GAGAL", "red"); } finally {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i data-lucide="upload" class="w-3.5 h-3.5"></i> PILIH FILE';
-                        lucide.createIcons();
-                        e.target.value = '';
-                    }
-                }
-            });
-        };
+function autoFill(val) {
+  const found = dbItems.find(x => x.barcode === val);
+  const submitBtn = document.getElementById('submitBtn');
+  if (found) { document.getElementById('fDesc').value = found.description || ''; submitBtn.disabled = false; barcodeNotFoundShown = false; }
+  else { document.getElementById('fDesc').value = ''; submitBtn.disabled = true; if (val.trim().length >= 6 && !barcodeNotFoundShown) { barcodeNotFoundShown = true; showToast("⚠️ Barcode tidak ditemukan. Hubungi Admin.", "error"); } }
+  if (!val.trim()) { barcodeNotFoundShown = false; submitBtn.disabled = true; }
+}
 
-        window.runManualNotif = async () => {
-            if (!verifyPin()) return;
-            try {
-                showNotif("MENGIRIM NOTIF...", "blue");
-                const res = await fetch('/api/notify');
-                const text = await res.text();
-                showNotif("NOTIF WA BERHASIL", "emerald");
-            } catch (err) {
-                showNotif("GAGAL KIRIM NOTIF", "red");
-            }
-        };
+// FUNGSI SEARCH YANG SUDAH DIUPDATE - OPSI 4 + OPSI 2 (tanpa batasan jumlah)
+function searchProductList(keyword) {
+  const container = document.getElementById('searchResults');
+  if (!keyword.trim()) { container.innerHTML = ''; return; }
+  
+  const search = keyword.toLowerCase();
+  // OPSI 2: Menampilkan SEMUA hasil (tanpa slice)
+  const results = dbItems.filter(item => 
+      (item.description || '').toLowerCase().includes(search) || 
+      (item.barcode || '').toLowerCase().includes(search)
+  );
+  
+  // OPSI 4: CSS sudah ditambahkan di style untuk overflow-y auto dan max-height
+  container.className = "search-results";
+  if (results.length === 0) {
+    container.innerHTML = `<div class="search-item" style="text-align:center; color:var(--text-2);">Tidak ditemukan</div>`;
+    return;
+  }
+  
+  container.innerHTML = results.map(item => 
+      `<div class="search-item" onclick="selectProduct('${item.barcode}')">
+          <div class="search-item-name">${escHtml(item.description)}</div>
+          <div class="search-item-barcode">${escHtml(item.barcode)}</div>
+      </div>`
+  ).join('');
+}
 
-        lucide.createIcons();
-    </script>
+function selectProduct(barcode) {
+  const item = dbItems.find(x => x.barcode === barcode);
+  if (!item) return;
+  document.getElementById('fBarcode').value = item.barcode;
+  document.getElementById('fDesc').value = item.description || '';
+  document.getElementById('searchProduct').value = item.description || '';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('submitBtn').disabled = false;
+  barcodeNotFoundShown = false;
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.panel, .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.add('active');
+  document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))?.classList.add('active');
+  
+  // Refresh data saat pindah ke tab Exp hari ini
+  if (t === 'expToday') {
+    renderExpTodayList();
+  }
+}
+
+function changePullDate(val) { selectedPullDate = val || getTodayStr(); renderPullList(); updateTabBadges(); }
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+  t.innerText = msg;
+  t.style.transform = 'translateX(-50%) translateY(-100px)'; t.style.opacity = '0'; t.style.visibility = 'hidden';
+  if (type === 'success') t.style.background = '#065f46';
+  else if (type === 'error') t.style.background = '#7f1d1d';
+  else if (type === 'warning') t.style.background = '#d97706';
+  else t.style.background = '#1c1033';
+  void t.offsetWidth;
+  t.style.transform = 'translateX(-50%) translateY(0)'; t.style.opacity = '1'; t.style.visibility = 'visible';
+  toastTimer = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(-100px)'; t.style.opacity = '0'; t.style.visibility = 'hidden'; toastTimer = null; }, 3000);
+}
+
+function toggleContact(id) {
+  document.querySelectorAll('.contact-popup').forEach(el => { if (el.id !== id) el.classList.remove('show'); });
+  document.getElementById(id).classList.toggle('show');
+}
+
+function openWA(number) { window.open('https://wa.me/' + number, '_blank'); }
+function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('Service Worker registered:', reg);
+  }).catch(err => {
+    console.log('Service Worker registration failed:', err);
+  });
+}
+
+window.onload = () => {
+  document.getElementById('headerDate').innerText = formatDateIndo(getTodayStr());
+  document.getElementById('pullDateFilter').value = getTodayStr();
+  selectedPullDate = getTodayStr();
+  document.getElementById('fExp').value = "";
+  loadCache();
+  if (dbItems.length > 0) databaseData = dbItems;
+  renderRecent(); renderPullList(); renderExpTodayList(); buildLokasiHistory(); loadAll(); initOfflineDetection(); updateTabBadges();
+};
+</script>
 </body>
 </html>
